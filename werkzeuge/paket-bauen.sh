@@ -11,13 +11,16 @@
 #   QUERENCIA_PACKAGING   Checkout von querencia-packaging mit dem Ordner
 #                         querencia-anmeldung/ (Standard: Worktree anm-1)
 #   QUERENCIA_JOBS        Cargo-Jobs (Standard 4)
+#   QUERENCIA_ANMELDUNG_AUSGABE  Ausgabeordner (Standard build/); eine neue
+#                         Fassung in einen eigenen Ordner bauen, damit die
+#                         vorige .deb (Rückfallpfad) liegen bleibt
 # Voraussetzung: Spiegel upstream/regreet.git (docs/building.md) und ein
 # Commit dieses Repositorys in querencia-packaging/querencia-anmeldung/
 # komponenten.conf.
 set -euo pipefail
 REPO=$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)
 PACKAGING=${QUERENCIA_PACKAGING:-$(dirname "$REPO")/querencia-packaging-wt-anm1}
-AUSGABE=$REPO/build
+AUSGABE=${QUERENCIA_ANMELDUNG_AUSGABE:-$REPO/build}
 [ -x "$PACKAGING/werkzeuge/paket-bauen.sh" ] || { echo "querencia-packaging fehlt: $PACKAGING" >&2; exit 1; }
 git -C "$REPO/upstream/regreet.git" rev-parse --verify -q '0.5.0^{commit}' >/dev/null ||
     { echo "Spiegel upstream/regreet.git fehlt (docs/building.md)" >&2; exit 1; }

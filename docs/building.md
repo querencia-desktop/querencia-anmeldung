@@ -34,6 +34,13 @@ Erst die Änderungen dieses Repositorys committen und den Commit in
 bash werkzeuge/paket-bauen.sh
 ```
 
+Eine neue Fassung neben der vorigen bauen (die vorige `.deb` bleibt als
+Rückfall liegen), mit dem Packaging-Worktree der Fassung:
+
+```bash
+QUERENCIA_PACKAGING=~/projects/querencia-packaging-wt-anm2 QUERENCIA_ANMELDUNG_AUSGABE=~/projects/querencia-anmeldung/build/0.1.1 bash werkzeuge/paket-bauen.sh
+```
+
 Das Skript ruft `orig-erzeugen.sh` (Archive, Vendoring, `debian/copyright`)
 und `paket-bauen.sh` des Packaging-Checkouts mit
 `QUERENCIA_AUSGABE=build/` auf. Ergebnis:
