@@ -47,8 +47,8 @@ Die Pfade, die ReGreet beim Bau übernimmt, stehen in `debian/rules`
 (`GREETD_CONFIG_DIR=/etc/querencia/greetd`,
 `STATE_DIR=/var/lib/querencia-anmeldung`,
 `LOG_DIR=/var/log/querencia-anmeldung`,
-`SESSION_DIRS=/usr/share/wayland-sessions:/usr/share/xsessions`); der Bau
-prüft, dass sie im Binary stehen.
+`SESSION_DIRS=/run/querencia-anmeldung/wayland-sessions`, die Liste von
+`sitzungen-auswahl`); der Bau prüft, dass sie im Binary stehen.
 
 ## Prüfen
 

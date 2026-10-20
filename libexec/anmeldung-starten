@@ -2,16 +2,28 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Befehl des Anmeldebildschirms (greetd default_session, Benutzer _greetd).
 #
-# Übernimmt Sprache (/etc/default/locale) und Tastaturbelegung
+# Stellt die Sitzungsliste zusammen (sitzungen-auswahl: nur Querencia-
+# und freigegebene Sitzungen, jede über die Sitzungshülle sitzung-starten),
+# übernimmt Sprache (/etc/default/locale) und Tastaturbelegung
 # (/etc/default/keyboard) des Systems und startet labwc ohne Menü und
 # Tastenkürzel mit ReGreet als einzigem Programm. labwc endet, sobald
 # ReGreet endet (-S); greetd startet dann die gewählte Sitzung.
+#
+# ReGreet liest Sitzungen aus XDG_DATA_DIRS, wenn die Variable gesetzt ist,
+# und sonst aus dem eingebauten SESSION_DIRS (/run/querencia-anmeldung/
+# wayland-sessions, von sitzungen-auswahl gefüllt). Deshalb läuft ReGreet
+# ohne XDG_DATA_DIRS; GTK nimmt dann /usr/local/share:/usr/share.
 #
 # Die Dateien werden zeilenweise gelesen statt mit "." eingelesen: ein
 # Tippfehler darin soll den Anmeldebildschirm nicht verhindern.
 
 KONFIG=${QUERENCIA_ANMELDUNG_KONFIG:-/etc/querencia/greetd}
 REGREET=${QUERENCIA_ANMELDUNG_REGREET:-/usr/libexec/querencia-anmeldung/regreet}
+AUSWAHL=${QUERENCIA_ANMELDUNG_AUSWAHL:-/usr/libexec/querencia-anmeldung/sitzungen-auswahl}
+
+# Meldungen ins Journal des Dienstes (stderr von greetd); ein Fehler hier
+# lässt ReGreet mit der leeren oder vorigen Liste starten.
+"$AUSWAHL" >&2 || echo "anmeldung-starten: keine Sitzung angeboten (siehe sitzungen-auswahl)" >&2
 
 # wert <zeile>: Wert hinter dem ersten "=", ohne umschließende Anführungszeichen
 wert() {
@@ -45,4 +57,5 @@ if [ -r /etc/default/keyboard ]; then
     done </etc/default/keyboard
 fi
 
-exec /usr/bin/dbus-run-session -- /usr/bin/labwc -C "$KONFIG/labwc" -S "$REGREET"
+unset XDG_DATA_DIRS
+exec /usr/bin/dbus-run-session -- /usr/bin/labwc -C "$KONFIG/labwc" -S "/usr/bin/env -u XDG_DATA_DIRS $REGREET"

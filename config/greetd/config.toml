@@ -2,6 +2,14 @@
 # Gelesen von /usr/sbin/querencia-anmeldung (greetd --config <diese Datei>);
 # die Konfiguration des Pakets greetd in /etc/greetd/ bleibt unberührt.
 
+[general]
+# /etc/profile und ~/.profile liest erst die Sitzungshülle
+# (/usr/libexec/querencia-anmeldung/sitzung-starten), nachdem sie
+# XDG_CURRENT_DESKTOP und DESKTOP_SESSION gesetzt hat, wie die
+# Anmelde-Shell unter GDM; Ubuntus /etc/profile.d richtet danach die
+# Ordner der Sitzung ein (z. B. /etc/xdg/xdg-ubuntu).
+source_profile = false
+
 [terminal]
 # Virtuelle Konsole des Anmeldebildschirms. 7 lässt tty1 für die
 # Text-Anmeldung frei (getty@tty1 läuft weiter).

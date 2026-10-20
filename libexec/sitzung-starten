@@ -1,0 +1,115 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Sitzungshülle der Querencia Anmeldung: startet eine Wayland-Sitzung mit
+# den Variablen, die GDM setzt.
+#
+#   sitzung-starten <sitzungsdatei>                   Sitzung starten
+#   sitzung-starten --ohne-variablen <sitzungsdatei>  wie 0.1.0 (Rückfall)
+#   sitzung-starten --pruefen <sitzungsdatei>         nur ausgeben
+#
+# <sitzungsdatei> ist eine wayland-sessions/*.desktop. Vor dem Start
+# exportiert die Hülle
+#   XDG_CURRENT_DESKTOP  aus DesktopNames, ";" wird ":"
+#   XDG_SESSION_DESKTOP  Dateiname ohne .desktop
+#   DESKTOP_SESSION      Dateiname ohne .desktop
+#   XDG_SESSION_TYPE     wayland
+# und lässt danach eine Shell /etc/profile und ~/.profile lesen und Exec
+# ausführen, wie die Anmelde-Shell, über die GDM Wayland-Sitzungen startet
+# (greetd liest die Profile deshalb nicht schon vorher: source_profile =
+# false in config.toml). Exec wird wie bei greetd von sh ausgewertet.
+#
+# --pruefen gibt Schlüssel=Wert-Zeilen aus (NAME, VERSTECKT, DESKTOPNAMES,
+# die vier Variablen, EXEC) und startet nichts; sitzungen-auswahl nutzt
+# das, um nur Dateien anzubieten, die die Hülle starten kann.
+# Exit 1: Datei fehlt oder ist unlesbar, keine Gruppe [Desktop Entry],
+# Type nicht Application, Exec fehlt, TryExec nicht vorhanden.
+
+PROG=sitzung-starten
+fehler() { echo "$PROG: $*" >&2; exit 1; }
+
+MODUS=starten
+case ${1:-} in
+--pruefen) MODUS=pruefen; shift ;;
+--ohne-variablen) MODUS=ohne; shift ;;
+esac
+[ $# -eq 1 ] || fehler "Aufruf: $PROG [--pruefen|--ohne-variablen] <sitzungsdatei>"
+DATEI=$1
+case $DATEI in
+*.desktop) ;;
+*) fehler "$DATEI: keine .desktop-Datei" ;;
+esac
+[ -f "$DATEI" ] && [ -r "$DATEI" ] || fehler "$DATEI: nicht lesbar"
+STAMM=${DATEI##*/}
+STAMM=${STAMM%.desktop}
+[ -n "$STAMM" ] || fehler "$DATEI: leerer Dateiname"
+
+# Escapes der Desktop-Entry-Spezifikation (\s \n \t \r \\) auflösen
+entschluesseln() {
+    printf '%s\n' "$1" | sed -e 's/\\\\/\x01/g' -e 's/\\s/ /g' -e 's/\\n/ /g' \
+        -e 's/\\t/\t/g' -e 's/\\r//g' -e 's/\x01/\\/g'
+}
+
+GRUPPE=
+GEFUNDEN=
+NAME= EXEC= TRYEXEC= DNAMES= TYP= VERSTECKT=nein
+while IFS= read -r zeile || [ -n "$zeile" ]; do
+    case $zeile in
+    '' | '#'*) continue ;;
+    '['*']')
+        GRUPPE=$zeile
+        [ "$GRUPPE" = '[Desktop Entry]' ] && GEFUNDEN=ja
+        continue ;;
+    esac
+    [ "$GRUPPE" = '[Desktop Entry]' ] || continue
+    case $zeile in *=*) ;; *) continue ;; esac
+    schluessel=${zeile%%=*}
+    wert=${zeile#*=}
+    # Leerzeichen um "=" zählen nicht (Spezifikation)
+    schluessel=$(printf '%s' "$schluessel" | sed 's/[[:space:]]*$//')
+    wert=$(printf '%s' "$wert" | sed 's/^[[:space:]]*//')
+    case $schluessel in
+    Name) [ -n "$NAME" ] || NAME=$(entschluesseln "$wert") ;;
+    Exec) [ -n "$EXEC" ] || EXEC=$(entschluesseln "$wert") ;;
+    TryExec) [ -n "$TRYEXEC" ] || TRYEXEC=$(entschluesseln "$wert") ;;
+    DesktopNames) [ -n "$DNAMES" ] || DNAMES=$(entschluesseln "$wert") ;;
+    Type) [ -n "$TYP" ] || TYP=$wert ;;
+    Hidden | NoDisplay) [ "$wert" = true ] && VERSTECKT=ja ;;
+    esac
+done <"$DATEI"
+
+[ -n "$GEFUNDEN" ] || fehler "$DATEI: keine Gruppe [Desktop Entry]"
+[ -z "$TYP" ] || [ "$TYP" = Application ] || fehler "$DATEI: Type=$TYP"
+[ -n "$EXEC" ] || fehler "$DATEI: Exec fehlt"
+if [ -n "$TRYEXEC" ]; then
+    case $TRYEXEC in
+    /*) [ -x "$TRYEXEC" ] || fehler "$DATEI: TryExec $TRYEXEC fehlt" ;;
+    *) command -v "$TRYEXEC" >/dev/null 2>&1 || fehler "$DATEI: TryExec $TRYEXEC fehlt" ;;
+    esac
+fi
+[ -n "$NAME" ] || NAME=$STAMM
+
+# "ubuntu;GNOME;" -> "ubuntu:GNOME"
+DESKTOP=$(printf '%s' "$DNAMES" | sed -e 's/;*$//' -e 's/;/:/g')
+
+if [ "$MODUS" = pruefen ]; then
+    printf 'NAME=%s\nVERSTECKT=%s\nDESKTOPNAMES=%s\n' "$NAME" "$VERSTECKT" "$DNAMES"
+    printf 'XDG_CURRENT_DESKTOP=%s\nXDG_SESSION_DESKTOP=%s\nDESKTOP_SESSION=%s\n' \
+        "$DESKTOP" "$STAMM" "$STAMM"
+    printf 'XDG_SESSION_TYPE=wayland\nEXEC=%s\n' "$EXEC"
+    exit 0
+fi
+
+if [ "$MODUS" = starten ]; then
+    # wie GDM: ohne DesktopNames bleibt XDG_CURRENT_DESKTOP ungesetzt
+    if [ -n "$DESKTOP" ]; then export XDG_CURRENT_DESKTOP="$DESKTOP"; else unset XDG_CURRENT_DESKTOP; fi
+    export XDG_SESSION_DESKTOP="$STAMM" DESKTOP_SESSION="$STAMM" XDG_SESSION_TYPE=wayland
+fi
+
+QUERENCIA_SITZUNG_EXEC=$EXEC
+export QUERENCIA_SITZUNG_EXEC
+# shellcheck disable=SC2016
+exec /bin/sh -c '[ -f /etc/profile ] && . /etc/profile
+[ -f "$HOME/.profile" ] && . "$HOME/.profile"
+befehl=$QUERENCIA_SITZUNG_EXEC
+unset QUERENCIA_SITZUNG_EXEC
+eval "exec $befehl"' sitzung-starten

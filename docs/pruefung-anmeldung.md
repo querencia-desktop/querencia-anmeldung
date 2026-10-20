@@ -30,13 +30,17 @@ ist der Dateiname des Belegs. Passwörter nicht in Belege schreiben.
 | G4 | Neustart | GDM erscheint wie vorher, Anmeldung an Ubuntu und an Querencia Desktop wie vorher |
 | G5 | `sudo dpkg-reconfigure querencia-anmeldung` | Frage „Standard-Anmeldedienst“ mit `gdm3` und `querencia-anmeldung`, vorbelegt `gdm3`; `querencia-anmeldung` wählen; Ausgabe „Standard-Anmeldedienst ist jetzt querencia-anmeldung (wirkt nach dem nächsten Neustart)“ |
 | G6 | wie 0.3 | `/usr/sbin/querencia-anmeldung`, `/usr/lib/systemd/system/querencia-anmeldung.service`; GDM läuft noch (nicht angehalten) |
-| G7 | Neustart | **Querencia-Anmeldebildschirm** auf Konsole 7: Grußtext „Querencia Desktop“, Hintergrund Querencia Blau, Thema Querencia-Klassisch, Uhr mit Datum in der Systemsprache; nirgends „Classic2“ |
-| G8 | Sitzungsliste öffnen | „Querencia Desktop“ **und** „Ubuntu“ wählbar |
+| G7 | Neustart | **Querencia-Anmeldebildschirm** auf Konsole 7: Grußtext „Querencia Desktop“, Hintergrund Querencia Blau, Thema Querencia-Klassisch, Uhr mit Datum in der Systemsprache; nirgends „Classic2“; Sitzung **„Querencia Desktop“ vorgewählt** (KB3) |
+| G8 | Sitzungsliste öffnen | **nur** „Querencia Desktop“ (kein „Ubuntu“, kein „labwc“) |
+| G8a | `cat /run/querencia-anmeldung/auswahl.txt; ls /run/querencia-anmeldung/wayland-sessions` | `angeboten …/querencia.desktop querencia`, `ausgeblendet …/ubuntu.desktop nicht-freigegeben`, ggf. `…/labwc.desktop labwc-nie`; im Ordner nur `querencia.desktop` mit `Exec=/usr/libexec/querencia-anmeldung/sitzung-starten /usr/share/wayland-sessions/querencia.desktop` |
+| G8b | Freigabe: `sudo sed -i 's/^freigeben =.*/freigeben = ubuntu labwc/' /etc/querencia/greetd/sitzungen.conf`, Neustart | Liste „Querencia Desktop“ **und** „Ubuntu“, weiter kein „labwc“; `auswahl.txt`: `ubuntu.desktop freigegeben`, `labwc.desktop labwc-nie` |
 | G9 | Benutzerliste, Passwortfeld: Zeichen `y`, `z`, `ö` tippen und sichtbar machen (Auge) | Belegung wie `/etc/default/keyboard` (bei `de`: y/z richtig) |
 | G10 | Rechtsklick auf den Hintergrund, `Alt+Tab`, `Alt+F2`, `Strg+Alt+T`, `Super` | nichts geschieht (kein Menü, kein Terminal) |
-| G11 | Anmelden mit Sitzung „Ubuntu“ | GNOME startet vollständig (Dock, Oben-Leiste); im Terminal `echo $XDG_SESSION_TYPE $XDG_CURRENT_DESKTOP` → `wayland ubuntu:GNOME`; `loginctl show-session $XDG_SESSION_ID -p Type -p Class` → `Type=wayland`, `Class=user` |
+| G11 | Anmelden mit Sitzung „Ubuntu“ (nach G8b) | GNOME startet vollständig (Dock, Oben-Leiste); im Terminal `echo $XDG_SESSION_TYPE $XDG_CURRENT_DESKTOP $XDG_SESSION_DESKTOP $DESKTOP_SESSION` → `wayland ubuntu:GNOME ubuntu ubuntu`; `echo $XDG_CONFIG_DIRS` enthält `/etc/xdg/xdg-ubuntu`; `gsettings get org.gnome.desktop.interface gtk-theme` und `icon-theme` → Yaru-Werte wie unter GDM; `loginctl show-session $XDG_SESSION_ID -p Type -p Class` → `Type=wayland`, `Class=user` |
+| G11a | Bildschirmsperre in GNOME (`Super+L`, Menü oben rechts) | **bekannte Grenze:** ohne laufenden GDM legt gnome-shell keine Bildschirmsperre an (Meldung „Die Sperrung des Bildschirms erfordert den GNOME Display-Manager“); deshalb ist GNOME ohne Freigabe nicht in der Liste (G8). Ergebnis festhalten |
 | G12 | in GNOME abmelden | Querencia-Anmeldebildschirm erscheint wieder (kein schwarzer Bildschirm), „Ubuntu“ und der Benutzer sind vorbelegt |
-| G13 | Anmelden mit „Querencia Desktop“ | Panel, Desktop, Hintergrund wie gewohnt; `echo $XDG_CURRENT_DESKTOP` → `X-Querencia` |
+| G12a | Freigabe zurücknehmen: `sudo sed -i 's/^freigeben =.*/freigeben =/' /etc/querencia/greetd/sitzungen.conf`, Neustart | nur „Querencia Desktop“, vorgewählt, obwohl zuletzt „Ubuntu“ gewählt war (`/var/lib/querencia-anmeldung/state.toml`) |
+| G13 | Anmelden mit „Querencia Desktop“ | Panel, Desktop, Hintergrund wie gewohnt; `echo $XDG_CURRENT_DESKTOP $XDG_SESSION_DESKTOP $DESKTOP_SESSION` → `X-Querencia querencia querencia` (wie unter GDM) |
 | G14 | in Querencia abmelden und **sofort** wieder anmelden (unter 10 s) | Sitzung kommt vollständig (QD-062-Gegenprobe unter greetd) |
 | G15 | Protokolle: `sudo tail -50 /var/log/querencia-anmeldung/log; journalctl -b -u querencia-anmeldung --no-pager \| tail -30` | keine `ERROR`-Zeilen außer bekannten Hinweisen; Hintergrund geladen (keine glycin-Fehler) |
 | G16 | Knopf „Neu starten“ im Anmeldebildschirm | System startet neu, Querencia-Anmeldebildschirm erscheint wieder |
@@ -52,7 +56,7 @@ ist der Dateiname des Belegs. Passwörter nicht in Belege schreiben.
 |---|---|---|
 | S1 | Paketsatz und `querencia-anmeldung` zusammen installieren (`apt-get install ./*.deb`) | Ausgabe „Standard-Anmeldedienst ist jetzt querencia-anmeldung“ |
 | S2 | wie 0.3 | `/usr/sbin/querencia-anmeldung`, `…/querencia-anmeldung.service` |
-| S3 | Neustart | Querencia-Anmeldebildschirm auf Konsole 7 wie G7; Sitzung „Querencia Desktop“ wählbar |
+| S3 | Neustart | Querencia-Anmeldebildschirm auf Konsole 7 wie G7; nur Sitzung „Querencia Desktop“, vorgewählt (auch wenn `labwc.desktop` installiert ist) |
 | S4 | `Strg+Alt+F1` | Textanmeldung auf tty1 weiter vorhanden; `Strg+Alt+F7` zurück zum Anmeldebildschirm |
 | S5 | Anmelden mit „Querencia Desktop“, abmelden, sofort wieder anmelden | wie G13, G14 |
 | S6 | `sudo apt remove -y querencia-anmeldung` | Ausgabe „Kein grafischer Anmeldedienst mehr eingetragen …“; `readlink …display-manager.service` leer |
@@ -61,7 +65,7 @@ ist der Dateiname des Belegs. Passwörter nicht in Belege schreiben.
 
 ## Belege und Rückmeldung
 
-- Bildschirmfotos `G7`, `G8`, `G11`, `G12`, `G18`, `S3`; Befehlsausgaben
+- Bildschirmfotos `G7`, `G8`, `G8b`, `G11`, `G11a`, `G12`, `G12a`, `G18`, `S3`; Befehlsausgaben
   der übrigen Punkte; `/var/log/querencia-anmeldung/log` und
   `journalctl -b -u querencia-anmeldung` bei jedem FAIL.
 - Bekannte Grenzen: ReGreet ist englisch beschriftet (Upstream ohne

@@ -1,4 +1,4 @@
-.TH QUERENCIA-ANMELDUNG 8 "2026-10-20" "querencia-anmeldung 0.1.0" "Querencia Desktop"
+.TH QUERENCIA-ANMELDUNG 8 "2026-10-20" "querencia-anmeldung 0.1.1" "Querencia Desktop"
 .SH NAME
 querencia-anmeldung \- login screen of Querencia Desktop (greetd with ReGreet)
 .SH SYNOPSIS
@@ -14,16 +14,58 @@ greetd shows the graphical greeter ReGreet as user
 .B _greetd
 in a
 .BR labwc (1)
-compositor without menu or key bindings. All sessions from
-.I /usr/share/wayland-sessions
-and
-.I /usr/share/xsessions
-can be chosen, so GNOME or Ubuntu stay available next to Querencia Desktop.
+compositor without menu or key bindings. By default it offers only the
+Querencia Desktop sessions; see
+.BR SESSIONS .
 .PP
 It is not meant to be run by hand; the service
 .B querencia-anmeldung.service
 starts it when it is the default display manager
 .RI ( display-manager.service ).
+.SH SESSIONS
+Each time the login screen appears,
+.I /usr/libexec/querencia-anmeldung/sitzungen-auswahl
+builds the session list in
+.I /run/querencia-anmeldung/wayland-sessions
+from
+.I /usr/local/share/wayland-sessions
+and
+.IR /usr/share/wayland-sessions .
+It offers the sessions whose
+.B DesktopNames
+contain
+.B X-Querencia
+and other sessions only when they are enabled with
+.B freigeben
+in
+.IR /etc/querencia/greetd/sitzungen.conf .
+The bare labwc session, hidden sessions, broken session files and X11
+sessions are never offered. Users without a valid last session get
+\(lqQuerencia Desktop\(rq preselected.
+.PP
+Every offered session starts through
+.IR /usr/libexec/querencia-anmeldung/sitzung-starten ,
+which sets
+.BR XDG_CURRENT_DESKTOP " (from " DesktopNames ),
+.BR XDG_SESSION_DESKTOP " and " DESKTOP_SESSION
+(from the file name) and
+.B XDG_SESSION_TYPE=wayland
+like GDM, then reads
+.I /etc/profile
+and
+.I ~/.profile
+and runs
+.BR Exec .
+.B huelle = nein
+in
+.I sitzungen.conf
+starts the sessions without these variables (behaviour of 0.1.0).
+.PP
+GNOME needs GDM for its screen lock: under this login screen GNOME runs
+without screen locking, even with the variables set. While GNOME is
+installed, GDM stays the default display manager; enable GNOME in
+.I sitzungen.conf
+only on purpose.
 .SH DEFAULT DISPLAY MANAGER
 As with gdm3 and lightdm, the default display manager is recorded in
 .I /etc/X11/default-display-manager
@@ -53,6 +95,9 @@ greetd configuration (virtual terminal 7, user _greetd).
 .I /etc/querencia/greetd/regreet.toml
 greeting, background, theme, clock.
 .TP
+.I /etc/querencia/greetd/sitzungen.conf
+sessions offered next to Querencia Desktop, session wrapper on or off.
+.TP
 .I /etc/querencia/greetd/labwc/
 labwc configuration of the login screen.
 .TP
@@ -61,6 +106,11 @@ ReGreet log.
 .TP
 .I /var/lib/querencia-anmeldung/
 last chosen user and session.
+.TP
+.I /run/querencia-anmeldung/
+session list for ReGreet and
+.I auswahl.txt
+(why each session file is offered or hidden).
 .SH SEE ALSO
 .BR greetd (1),
 .BR greetd (5),

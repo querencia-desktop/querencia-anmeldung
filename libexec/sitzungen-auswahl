@@ -1,0 +1,239 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Stellt bei jedem Erscheinen des Anmeldebildschirms die Sitzungsliste für
+# ReGreet zusammen (Benutzer _greetd, aufgerufen von anmeldung-starten).
+#
+# ReGreet ist mit SESSION_DIRS=/run/querencia-anmeldung/wayland-sessions
+# gebaut und sieht nur die Dateien, die hier entstehen; anmeldung-starten
+# entfernt XDG_DATA_DIRS, das sonst Vorrang vor SESSION_DIRS hätte.
+# Für jede angebotene Sitzung entsteht eine Datei mit dem Namen der
+# Originaldatei und
+#   Exec=/usr/libexec/querencia-anmeldung/sitzung-starten <originaldatei>
+#
+# Angeboten werden (Einstellungen in /etc/querencia/greetd/sitzungen.conf):
+#   - Sitzungen von Querencia Desktop (DesktopNames enthält X-Querencia),
+#   - andere Sitzungen nur, wenn ihr Dateiname unter "freigeben" steht,
+#   - nie die nackte labwc-Sitzung, nie versteckte (Hidden, NoDisplay),
+#     nie Dateien, die sitzung-starten --pruefen ablehnt, nie Pfade mit
+#     Zeichen, die greetd beim Start nicht unverändert weitergibt.
+# Fehlt die Hülle, entsteht eine leere Liste (keine Sitzung ohne Hülle).
+#
+# Danach die Vorwahl (KB3): In state.toml von ReGreet bekommt jeder
+# Benutzer ohne gültige letzte Sitzung "Querencia Desktop".
+#
+# Ausgabe: je Sitzungsdatei eine Zeile "angeboten|ausgeblendet <datei>
+# <grund>" (auch in /run/querencia-anmeldung/auswahl.txt).
+
+KONFIG=${QUERENCIA_ANMELDUNG_KONFIG:-/etc/querencia/greetd}
+HUELLE=${QUERENCIA_ANMELDUNG_HUELLE:-/usr/libexec/querencia-anmeldung/sitzung-starten}
+QUELLEN=${QUERENCIA_ANMELDUNG_QUELLEN:-/usr/local/share/wayland-sessions /usr/share/wayland-sessions}
+LAUFZEIT=${QUERENCIA_ANMELDUNG_LAUFZEIT:-/run/querencia-anmeldung}
+ZUSTAND=${QUERENCIA_ANMELDUNG_ZUSTAND:-/var/lib/querencia-anmeldung/state.toml}
+LOGINDEFS=${QUERENCIA_ANMELDUNG_LOGINDEFS:-/etc/login.defs}
+PASSWD=${QUERENCIA_ANMELDUNG_PASSWD:-}
+
+PROG=sitzungen-auswahl
+meldung() { echo "$PROG: $*" >&2; }
+
+# wert <zeile>: Wert hinter dem ersten "=", ohne Leerzeichen und
+# umschließende Anführungszeichen
+wert() {
+    v=$(printf '%s' "${1#*=}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+    case $v in
+    \"*\") v=${v#\"}; v=${v%\"} ;;
+    \'*\') v=${v#\'}; v=${v%\'} ;;
+    esac
+    printf '%s' "$v"
+}
+
+FREIGEBEN=
+MIT_HUELLE=ja
+if [ -r "$KONFIG/sitzungen.conf" ]; then
+    while IFS= read -r zeile || [ -n "$zeile" ]; do
+        schluessel=$(printf '%s' "${zeile%%=*}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+        case $zeile in
+        '#'* | '') continue ;;
+        *=*) ;;
+        *) meldung "sitzungen.conf: Zeile ohne \"=\" übergangen: $zeile"; continue ;;
+        esac
+        case $schluessel in
+        freigeben) FREIGEBEN=$(wert "$zeile") ;;
+        huelle)
+            case $(wert "$zeile") in
+            ja) MIT_HUELLE=ja ;;
+            nein) MIT_HUELLE=nein ;;
+            *) meldung "sitzungen.conf: huelle = $(wert "$zeile") unbekannt (ja|nein), bleibt ja" ;;
+            esac ;;
+        *) meldung "sitzungen.conf: Schlüssel $schluessel unbekannt, übergangen" ;;
+        esac
+    done <"$KONFIG/sitzungen.conf"
+fi
+
+ist_freigegeben() {
+    for f in $FREIGEBEN; do [ "$f" = "$1" ] && return 0; done
+    return 1
+}
+
+# enthaelt <liste mit ;> <name>
+enthaelt() {
+    case ";$1;" in *";$2;"*) return 0 ;; esac
+    return 1
+}
+
+mkdir -p "$LAUFZEIT" 2>/dev/null
+NEU=$LAUFZEIT/wayland-sessions.neu
+rm -rf "$NEU"
+if ! mkdir "$NEU"; then
+    meldung "kann $NEU nicht anlegen; Sitzungsliste bleibt wie zuletzt"
+    exit 1
+fi
+NAMEN=$NEU/.namen
+: >"$NAMEN"
+BERICHT=$NEU/.auswahl
+: >"$BERICHT"
+VORWAHL=
+
+bericht() { printf '%s\n' "$*" >>"$BERICHT"; }
+
+HUELLE_DA=ja
+case $HUELLE in
+*[!A-Za-z0-9._/+-]* | '') HUELLE_DA= ;;
+*) [ -x "$HUELLE" ] || HUELLE_DA= ;;
+esac
+[ -n "$HUELLE_DA" ] || meldung "Sitzungshülle $HUELLE fehlt: keine Sitzung angeboten"
+
+GESEHEN=" "
+for q in $QUELLEN; do
+    for datei in "$q"/*.desktop; do
+        [ -e "$datei" ] || continue
+        stamm=${datei##*/}
+        stamm=${stamm%.desktop}
+        # die erste Datei eines Namens gewinnt (/usr/local/share vor /usr/share)
+        case $GESEHEN in *" $stamm "*) bericht "ausgeblendet $datei verdeckt"; continue ;; esac
+        GESEHEN="$GESEHEN$stamm "
+
+        if [ -z "$HUELLE_DA" ]; then
+            bericht "ausgeblendet $datei keine-huelle"; continue
+        fi
+        case $datei in
+        *[!A-Za-z0-9._/+-]*) bericht "ausgeblendet $datei pfad-zeichen"; continue ;;
+        esac
+        if ! angaben=$(sh "$HUELLE" --pruefen "$datei" 2>&1); then
+            bericht "ausgeblendet $datei kaputt ($(printf '%s' "$angaben" | tail -n 1))"; continue
+        fi
+        name= versteckt= dnames=
+        alt_ifs=$IFS
+        IFS='
+'
+        set -f
+        for z in $angaben; do
+            case $z in
+            NAME=*) name=${z#NAME=} ;;
+            VERSTECKT=*) versteckt=${z#VERSTECKT=} ;;
+            DESKTOPNAMES=*) dnames=${z#DESKTOPNAMES=} ;;
+            esac
+        done
+        set +f
+        IFS=$alt_ifs
+
+        if [ "$versteckt" = ja ]; then
+            bericht "ausgeblendet $datei versteckt"; continue
+        fi
+        if [ "$stamm" = labwc ] || { enthaelt "$dnames" labwc && ! enthaelt "$dnames" X-Querencia; }; then
+            bericht "ausgeblendet $datei labwc-nie"; continue
+        fi
+        if enthaelt "$dnames" X-Querencia; then
+            grund=querencia
+        elif ist_freigegeben "$stamm"; then
+            grund=freigegeben
+        else
+            bericht "ausgeblendet $datei nicht-freigegeben"; continue
+        fi
+        if grep -qxF -- "$name" "$NAMEN"; then
+            bericht "ausgeblendet $datei name-doppelt"; continue
+        fi
+        if [ "$MIT_HUELLE" = ja ]; then
+            befehl="$HUELLE $datei"
+        else
+            befehl="$HUELLE --ohne-variablen $datei"
+        fi
+        {
+            echo "[Desktop Entry]"
+            echo "Type=Application"
+            echo "Name=$name"
+            echo "Comment=Querencia Anmeldung: $datei"
+            echo "Exec=$befehl"
+        } >"$NEU/$stamm.desktop"
+        printf '%s\n' "$name" >>"$NAMEN"
+        bericht "angeboten $datei $grund"
+        if [ "$grund" = querencia ] && { [ -z "$VORWAHL" ] || [ "$stamm" = querencia ]; }; then
+            VORWAHL=$name
+        fi
+    done
+done
+
+# Vorwahl in state.toml: Benutzer (UID_MIN..UID_MAX, mit Anmelde-Shell)
+# ohne Eintrag oder mit einer Sitzung, die nicht mehr angeboten wird,
+# bekommen die Querencia-Sitzung.
+vorwahl_setzen() {
+    case $VORWAHL in *[\"\\]*) meldung "Vorwahl: Name $VORWAHL nicht in TOML schreibbar"; return 0 ;; esac
+    uid_min=1000 uid_max=60000
+    if [ -r "$LOGINDEFS" ]; then
+        v=$(awk '$1 == "UID_MIN" { print $2 }' "$LOGINDEFS"); [ -n "$v" ] && uid_min=$v
+        v=$(awk '$1 == "UID_MAX" { print $2 }' "$LOGINDEFS"); [ -n "$v" ] && uid_max=$v
+    fi
+    benutzer=$NEU/.benutzer
+    if [ -n "$PASSWD" ]; then cat "$PASSWD"; else getent passwd; fi 2>/dev/null |
+        awk -F: -v min="$uid_min" -v max="$uid_max" '
+            $3 >= min && $3 <= max && $7 !~ /(nologin|false)$/ && $1 ~ /^[a-z_][a-z0-9_-]*$/ { print $1 }' >"$benutzer"
+    neu=$NEU/.state.toml
+    quelle=/dev/null
+    [ -f "$ZUSTAND" ] && quelle=$ZUSTAND
+    awk -v vorwahl="$VORWAHL" -v namen="$NAMEN" -v benutzer="$benutzer" '
+        BEGIN {
+            while ((getline n < namen) > 0) gueltig[n] = 1
+            while ((getline b < benutzer) > 0) offen[b] = 1
+        }
+        function rest(   b) {
+            for (b in offen) { printf "%s = \"%s\"\n", b, vorwahl; geaendert = 1 }
+            split("", offen)
+        }
+        /^\[/ {
+            if (abschnitt) rest()
+            abschnitt = ($0 == "[user_to_last_sess]")
+            if (abschnitt) gefunden = 1
+            print; next
+        }
+        abschnitt && /^[A-Za-z0-9_-]+ = "[^"\\]*"$/ {
+            k = $0; sub(/ = .*/, "", k)
+            v = $0; sub(/^[^=]* = "/, "", v); sub(/"$/, "", v)
+            delete offen[k]
+            if (!(v in gueltig)) { printf "%s = \"%s\"\n", k, vorwahl; geaendert = 1; next }
+        }
+        { print }
+        END {
+            if (abschnitt) rest()
+            else {
+                for (b in offen) { if (!gefunden) { print "[user_to_last_sess]"; gefunden = 1 }
+                                   printf "%s = \"%s\"\n", b, vorwahl; geaendert = 1 }
+            }
+            exit geaendert ? 0 : 3
+        }' "$quelle" >"$neu"
+    rc=$?
+    if [ $rc -eq 0 ]; then
+        if cat "$neu" >"$ZUSTAND.neu" 2>/dev/null && mv -f "$ZUSTAND.neu" "$ZUSTAND"; then
+            meldung "Vorwahl \"$VORWAHL\" in $ZUSTAND eingetragen"
+        else
+            rm -f "$ZUSTAND.neu"
+            meldung "Vorwahl: $ZUSTAND nicht schreibbar"
+        fi
+    fi
+}
+[ -z "$VORWAHL" ] || vorwahl_setzen
+
+rm -rf "$LAUFZEIT/wayland-sessions"
+mv "$BERICHT" "$LAUFZEIT/auswahl.txt"
+rm -f "$NEU"/.namen "$NEU"/.benutzer "$NEU"/.state.toml
+mv "$NEU" "$LAUFZEIT/wayland-sessions"
+cat "$LAUFZEIT/auswahl.txt"
+grep -q '^angeboten ' "$LAUFZEIT/auswahl.txt"
