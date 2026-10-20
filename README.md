@@ -27,7 +27,7 @@ Upstream-Release 0.5.0 und wird erst beim Paketbau dazugelegt
 | `sbin/querencia-anmeldung` | startet greetd mit dieser Konfiguration | `/usr/sbin/` |
 | `libexec/anmeldung-starten` | Befehl des Anmeldebildschirms: Sitzungsauswahl, Sprache und Tastatur des Systems, dann labwc + ReGreet | `/usr/libexec/querencia-anmeldung/` |
 | `libexec/sitzungen-auswahl` | Sitzungsliste für ReGreet: Querencia und freigegebene Sitzungen, Vorwahl | `/usr/libexec/querencia-anmeldung/` |
-| `libexec/sitzung-starten` | Sitzungshülle: Variablen wie GDM, Profile, `Exec` | `/usr/libexec/querencia-anmeldung/` |
+| `libexec/sitzung-starten` | Sitzungshülle: Variablen wie GDM, dann `Exec` | `/usr/libexec/querencia-anmeldung/` |
 | `systemd/querencia-anmeldung.service` | Dienst mit `Alias=display-manager.service` | `/usr/lib/systemd/system/` |
 | `tmpfiles/` | Zustands- und Protokollordner von ReGreet | `/usr/lib/tmpfiles.d/` |
 | `man/querencia-anmeldung.8` | Handbuchseite | `/usr/share/man/man8/` |

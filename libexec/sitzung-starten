@@ -4,7 +4,7 @@
 # den Variablen, die GDM setzt.
 #
 #   sitzung-starten <sitzungsdatei>                   Sitzung starten
-#   sitzung-starten --ohne-variablen <sitzungsdatei>  wie 0.1.0 (Rückfall)
+#   sitzung-starten --ohne-variablen <sitzungsdatei>  nur Exec (wie 0.1.0)
 #   sitzung-starten --pruefen <sitzungsdatei>         nur ausgeben
 #
 # <sitzungsdatei> ist eine wayland-sessions/*.desktop. Vor dem Start
@@ -13,10 +13,11 @@
 #   XDG_SESSION_DESKTOP  Dateiname ohne .desktop
 #   DESKTOP_SESSION      Dateiname ohne .desktop
 #   XDG_SESSION_TYPE     wayland
-# und lässt danach eine Shell /etc/profile und ~/.profile lesen und Exec
-# ausführen, wie die Anmelde-Shell, über die GDM Wayland-Sitzungen startet
-# (greetd liest die Profile deshalb nicht schon vorher: source_profile =
-# false in config.toml). Exec wird wie bei greetd von sh ausgewertet.
+# und führt danach Exec aus; sh wertet Exec aus wie greetd selbst.
+# /etc/profile und ~/.profile hat greetd vorher gelesen (source_profile,
+# wie in 0.1.0); GNOME liest sie mit den gesetzten Variablen noch einmal,
+# weil gnome-session sich in einer Anmelde-Shell neu startet – so auch
+# unter GDM, das selbst keine Profile liest.
 #
 # --pruefen gibt Schlüssel=Wert-Zeilen aus (NAME, VERSTECKT, DESKTOPNAMES,
 # die vier Variablen, EXEC) und startet nichts; sitzungen-auswahl nutzt
@@ -105,11 +106,4 @@ if [ "$MODUS" = starten ]; then
     export XDG_SESSION_DESKTOP="$STAMM" DESKTOP_SESSION="$STAMM" XDG_SESSION_TYPE=wayland
 fi
 
-QUERENCIA_SITZUNG_EXEC=$EXEC
-export QUERENCIA_SITZUNG_EXEC
-# shellcheck disable=SC2016
-exec /bin/sh -c '[ -f /etc/profile ] && . /etc/profile
-[ -f "$HOME/.profile" ] && . "$HOME/.profile"
-befehl=$QUERENCIA_SITZUNG_EXEC
-unset QUERENCIA_SITZUNG_EXEC
-eval "exec $befehl"' sitzung-starten
+eval "exec $EXEC"

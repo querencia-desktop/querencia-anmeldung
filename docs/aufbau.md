@@ -55,11 +55,15 @@ nehmen.
 `sitzung-starten <sitzungsdatei>` macht, was GDM vor dem Start einer
 Sitzung macht: `XDG_CURRENT_DESKTOP` aus `DesktopNames` (`;` → `:`, ohne
 `DesktopNames` ungesetzt), `XDG_SESSION_DESKTOP` und `DESKTOP_SESSION`
-aus dem Dateinamen, `XDG_SESSION_TYPE=wayland`; danach liest eine Shell
-`/etc/profile` und `~/.profile` (wie die Anmelde-Shell unter GDM, daher
-`source_profile = false` in `config.toml`) und führt `Exec` aus. Ubuntus
-`/etc/profile.d` ergänzt dann die Ordner der Sitzung (z. B.
-`/etc/xdg/xdg-ubuntu`). `GDMSESSION` setzt die Hülle nicht.
+aus dem Dateinamen, `XDG_SESSION_TYPE=wayland`; danach führt sie `Exec`
+aus (`sh` wertet es aus wie greetd selbst). `/etc/profile` und
+`~/.profile` liest greetd vorher (`source_profile`, Vorgabe, wie 0.1.0);
+die Hülle liest sie nicht noch einmal, so wie GDM selbst keine Profile
+liest. GNOME startet sich danach in einer Anmelde-Shell neu
+(gnome-session 50, „Relaunching with login shell“) und liest die Profile
+dann mit den gesetzten Variablen; Ubuntus `/etc/profile.d` ergänzt so die
+Ordner der Sitzung (z. B. `/etc/xdg/xdg-ubuntu`). `GDMSESSION` setzt die
+Hülle nicht.
 
 **GNOME und die Bildschirmsperre:** gnome-shell legt die Bildschirmsperre
 nur an, wenn GDM auf dem Systembus antwortet (`LoginManager.canLock()`
@@ -70,8 +74,8 @@ daran nichts. Deshalb ist GNOME nicht freigegeben, und bei installiertem
 GNOME bleibt GDM Standard-Anmeldedienst.
 
 `huelle = nein` in `sitzungen.conf` startet dieselben Sitzungen über
-`sitzung-starten --ohne-variablen` (Profile und `Exec` wie 0.1.0, ohne
-die vier Variablen) – Rückfall, falls eine Sitzung mit den Variablen nicht
+`sitzung-starten --ohne-variablen` (nur `Exec`, wie 0.1.0, ohne die
+vier Variablen) – Rückfall, falls eine Sitzung mit den Variablen nicht
 zurechtkommt. In ReGreet bleibt die Eingabe eines eigenen Befehls möglich
 (Stift-Knopf neben der Sitzung); dieser Weg umgeht Auswahl und Hülle.
 

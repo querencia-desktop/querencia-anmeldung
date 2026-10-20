@@ -5,10 +5,8 @@
 - Sitzungshülle `sitzung-starten <sitzungsdatei>` (KB1): setzt wie GDM
   `XDG_CURRENT_DESKTOP` aus `DesktopNames` (`;` → `:`),
   `XDG_SESSION_DESKTOP` und `DESKTOP_SESSION` aus dem Dateinamen und
-  `XDG_SESSION_TYPE=wayland`, liest danach `/etc/profile` und
-  `~/.profile` und führt `Exec` aus. greetd liest die Profile nicht mehr
-  vorher (`source_profile = false`). Für Querencia Desktop dasselbe
-  Ergebnis wie bisher (`X-Querencia`).
+  `XDG_SESSION_TYPE=wayland` und führt danach `Exec` aus. Für Querencia
+  Desktop dasselbe Ergebnis wie unter GDM (`X-Querencia`, `querencia`).
 - Sitzungsauswahl `sitzungen-auswahl` bei jedem Erscheinen des
   Anmeldebildschirms: ReGreet (gebaut mit `SESSION_DIRS` auf
   `/run/querencia-anmeldung/wayland-sessions`, ohne `XDG_DATA_DIRS`

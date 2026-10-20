@@ -42,7 +42,7 @@ pruefe "greetd: Befehl anmeldung-starten" \
     "[ \"\$(wert $C default_session.command)\" = /usr/libexec/querencia-anmeldung/anmeldung-starten ]"
 pruefe "greetd: Benutzer _greetd" "[ \"\$(wert $C default_session.user)\" = _greetd ]"
 pruefe "greetd: Konsole 7" "[ \"\$(wert $C terminal.vt)\" = 7 ]"
-pruefe "greetd: Profile liest erst die Hülle" "[ \"\$(wert $C general.source_profile)\" = False ]"
+pruefe "greetd: liest die Profile selbst (source_profile nicht abgeschaltet)" "! grep -q source_profile '$C'"
 pruefe "ReGreet: Grußtext Querencia Desktop" "[ \"\$(wert $G appearance.greeting_msg)\" = 'Querencia Desktop' ]"
 pruefe "ReGreet: Thema Querencia-Klassisch" "[ \"\$(wert $G GTK.theme_name)\" = Querencia-Klassisch ]"
 pruefe "ReGreet: Symbolthema Querencia" "[ \"\$(wert $G GTK.icon_theme_name)\" = Querencia ]"
@@ -152,7 +152,7 @@ Name = Test
 Exec = sh -c "env | grep -E '^(XDG_|DESKTOP_SESSION=|PROFIL)' | sort; echo ARG \$0 \$1" eins "zwei drei"
 DesktopNames=ubuntu;GNOME;
 EOT
-# ~/.profile zeigt, ob es nach dem Setzen der Variablen gelesen wird
+# ~/.profile darf die Hülle nicht noch einmal lesen (greetd hat es gelesen)
 echo 'PROFIL_SAH="$DESKTOP_SESSION"; export PROFIL_SAH' >"$TMP/home/.profile"
 
 pp() { sh "$H" --pruefen "$1" 2>&1; }
@@ -175,11 +175,11 @@ pruefe "Hülle startet: XDG_CURRENT_DESKTOP" "grep -qx XDG_CURRENT_DESKTOP=ubunt
 pruefe "Hülle startet: XDG_SESSION_DESKTOP, DESKTOP_SESSION" \
     "grep -qx XDG_SESSION_DESKTOP=test '$TMP/huelle.out' && grep -qx DESKTOP_SESSION=test '$TMP/huelle.out'"
 pruefe "Hülle startet: XDG_SESSION_TYPE" "grep -qx XDG_SESSION_TYPE=wayland '$TMP/huelle.out'"
-pruefe "Hülle startet: ~/.profile nach den Variablen" "grep -qx PROFIL_SAH=test '$TMP/huelle.out'"
+pruefe "Hülle startet: liest ~/.profile nicht noch einmal" "! grep -q '^PROFIL_SAH=' '$TMP/huelle.out'"
 pruefe "Hülle startet: Argumente mit Anführungszeichen" "grep -qx 'ARG eins zwei drei' '$TMP/huelle.out'"
 env -i PATH=/usr/bin:/bin HOME="$TMP/home" sh "$H" --ohne-variablen "$Q/usr/test.desktop" >"$TMP/huelle2.out" 2>&1
-pruefe "Hülle --ohne-variablen: keine Variablen, Profil gelesen" \
-    "! grep -q '^XDG_CURRENT_DESKTOP=' '$TMP/huelle2.out' && ! grep -q '^DESKTOP_SESSION=' '$TMP/huelle2.out' && grep -qx PROFIL_SAH= '$TMP/huelle2.out' && grep -qx 'ARG eins zwei drei' '$TMP/huelle2.out'"
+pruefe "Hülle --ohne-variablen: keine Variablen, nur Exec" \
+    "! grep -q '^XDG_CURRENT_DESKTOP=' '$TMP/huelle2.out' && ! grep -q '^DESKTOP_SESSION=' '$TMP/huelle2.out' && grep -qx 'ARG eins zwei drei' '$TMP/huelle2.out'"
 
 # --- Sitzungsauswahl -----------------------------------------------------
 A=$D/libexec/sitzungen-auswahl
