@@ -17,6 +17,8 @@
   deshalb nicht freigegeben.
 - Vorwahl „Querencia Desktop“ (KB3) für Benutzer ohne gültige letzte
   Sitzung in `state.toml` von ReGreet.
+- README: GNOME sperrt nur unter GDM (gnome-shell koppelt die Sperre an
+  `org.gnome.DisplayManager`); gilt für jeden anderen Anmeldebildschirm.
 - Rückfall `huelle = nein` in `sitzungen.conf`: Sitzungen ohne die
   Variablen starten (Verhalten 0.1.0).
 

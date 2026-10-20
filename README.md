@@ -52,6 +52,29 @@ sudo dpkg-reconfigure querencia-anmeldung
 Entfernen trägt den vorherigen Display-Manager (z. B. GDM) wieder ein.
 Einzelheiten: `docs/umschalten.md`.
 
+## GNOME und die Bildschirmsperre
+
+GNOME sperrt den Bildschirm nur, wenn GDM läuft. gnome-shell legt die
+Bildschirmsperre beim Start nur an, wenn der Dienst
+`org.gnome.DisplayManager` auf dem Systembus antwortet, also GDM:
+`js/ui/main.js` (`if (LoginManager.canLock()) screenShield = new
+ScreenShield.ScreenShield();`) und `js/misc/loginManager.js`
+(`canLock()` fragt `org.gnome.DisplayManager.Manager` nach `Version`),
+nachgelesen in gnome-shell 50.1 (Ubuntu 26.04). Ohne GDM meldet GNOME
+„Bildschirmsperre deaktiviert – Die Sperrung des Bildschirms erfordert den
+GNOME Display-Manager“.
+
+Das gilt für **jeden** anderen Anmeldebildschirm (greetd, LightDM, SDDM …),
+nicht nur für die Querencia Anmeldung, und ist kein Fehler von Querencia
+Desktop. Querencia Desktop sperrt mit eigenem Werkzeug (`querencia-sitzung`,
+Strg+Alt+L, Wayland-Protokoll `ext-session-lock`) und braucht dafür keinen
+GDM.
+
+Deshalb bietet die Querencia Anmeldung GNOME nicht an, solange es nicht in
+`/etc/querencia/greetd/sitzungen.conf` freigegeben ist, und auf einem
+Ubuntu Desktop bleibt GDM der Standard-Anmeldedienst. Die Querencia
+Anmeldung bildet `org.gnome.DisplayManager` bewusst nicht nach.
+
 ## Bauen und Prüfen
 
 ```bash
