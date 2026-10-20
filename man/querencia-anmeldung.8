@@ -1,67 +1,67 @@
 .TH QUERENCIA-ANMELDUNG 8 "2026-10-20" "querencia-anmeldung 0.1.0" "Querencia Desktop"
 .SH NAME
-querencia-anmeldung \- Anmeldebildschirm von Querencia Desktop (greetd mit ReGreet)
+querencia-anmeldung \- login screen of Querencia Desktop (greetd with ReGreet)
 .SH SYNOPSIS
 .B querencia-anmeldung
-.RI [ greetd-optionen ]
-.SH BESCHREIBUNG
+.RI [ greetd-options ]
+.SH DESCRIPTION
 .B querencia-anmeldung
-startet
+runs
 .BR greetd (1)
-mit der Konfiguration
+with the configuration
 .IR /etc/querencia/greetd/config.toml .
-greetd zeigt als Benutzer
+greetd shows the graphical greeter ReGreet as user
 .B _greetd
-den grafischen Anmeldebildschirm ReGreet in einem
+in a
 .BR labwc (1)
-ohne Menü und Tastenkürzel. Zur Wahl stehen alle Sitzungen aus
+compositor without menu or key bindings. All sessions from
 .I /usr/share/wayland-sessions
-und
-.IR /usr/share/xsessions ,
-also neben Querencia Desktop auch GNOME bzw. Ubuntu.
+and
+.I /usr/share/xsessions
+can be chosen, so GNOME or Ubuntu stay available next to Querencia Desktop.
 .PP
-Das Programm wird nicht von Hand aufgerufen, sondern vom Dienst
-.BR querencia-anmeldung.service ,
-sobald dieser der Standard-Anmeldedienst ist
+It is not meant to be run by hand; the service
+.B querencia-anmeldung.service
+starts it when it is the default display manager
 .RI ( display-manager.service ).
-.SH STANDARD-ANMELDEDIENST
-Welcher Anmeldedienst beim Start läuft, steht wie bei gdm3 und lightdm in
+.SH DEFAULT DISPLAY MANAGER
+As with gdm3 and lightdm, the default display manager is recorded in
 .I /etc/X11/default-display-manager
-und in der debconf-Frage
+and in the debconf question
 .BR shared/default-x-display-manager .
-Bei der Installation wird die Querencia Anmeldung nur dann Standard, wenn
-noch kein anderer Anmeldedienst eingerichtet ist, wenn sie in der Frage
-gewählt wird oder wenn
+On installation the Querencia login screen becomes the default only when no
+other display manager is set up, when it is chosen in that question, or when
 .B QUERENCIA_ANMELDUNG=ja
-gesetzt ist. Ein laufender Anmeldedienst wird nie angehalten; der Wechsel
-wirkt nach dem nächsten Neustart.
+is set. A running display manager is never stopped; a change takes effect
+at the next boot.
 .TP
 .B sudo dpkg-reconfigure querencia-anmeldung
-fragt nach dem Standard-Anmeldedienst (z.\~B. gdm3 oder querencia-anmeldung).
+asks for the default display manager (for example gdm3 or
+querencia-anmeldung).
 .TP
 .B sudo QUERENCIA_ANMELDUNG=nein dpkg-reconfigure querencia-anmeldung
-schaltet ohne Frage zurück auf den zuvor aktiven bzw. einen anderen
-installierten Anmeldedienst.
+switches back, without a question, to the display manager that was active
+before (or to another installed one).
 .PP
-Beim Entfernen des Pakets wird der vorherige Anmeldedienst (etwa GDM)
-wieder eingetragen.
-.SH DATEIEN
+Removing the package restores the previous display manager, for example
+GDM.
+.SH FILES
 .TP
 .I /etc/querencia/greetd/config.toml
-greetd-Konfiguration (Konsole 7, Benutzer _greetd).
+greetd configuration (virtual terminal 7, user _greetd).
 .TP
 .I /etc/querencia/greetd/regreet.toml
-Grußtext, Hintergrund, Thema, Uhr.
+greeting, background, theme, clock.
 .TP
 .I /etc/querencia/greetd/labwc/
-labwc-Konfiguration des Anmeldebildschirms.
+labwc configuration of the login screen.
 .TP
 .I /var/log/querencia-anmeldung/log
-Protokoll von ReGreet.
+ReGreet log.
 .TP
 .I /var/lib/querencia-anmeldung/
-zuletzt gewählter Benutzer und Sitzung; Merker des vorherigen Anmeldedienstes.
-.SH SIEHE AUCH
+last chosen user and session.
+.SH SEE ALSO
 .BR greetd (1),
 .BR greetd (5),
 .BR labwc (1),

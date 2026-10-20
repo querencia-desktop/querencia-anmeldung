@@ -1,3 +1,7 @@
 # Ausnahmen für ai-clean/clean_check.py (Querencia Anmeldung 0.1.0, 20.10.2026).
 # Bewusst KEINE Pfadeinträge (ein Pfad schaltet alle Prüfungen ab, auch
 # security); begründete Ausnahmen stehen nur als Kommentar hier.
+#
+# S004 config/greetd/regreet.toml: deutsche Anführungszeichen („Querencia
+#      Blau“) im Kommentar folgen der Typografie der übrigen Querencia-Doku
+#      (Projektstil, nicht global ersetzen).
