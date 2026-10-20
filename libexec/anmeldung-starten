@@ -1,0 +1,48 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Befehl des Anmeldebildschirms (greetd default_session, Benutzer _greetd).
+#
+# Übernimmt Sprache (/etc/default/locale) und Tastaturbelegung
+# (/etc/default/keyboard) des Systems und startet labwc ohne Menü und
+# Tastenkürzel mit ReGreet als einzigem Programm. labwc endet, sobald
+# ReGreet endet (-S); greetd startet dann die gewählte Sitzung.
+#
+# Die Dateien werden zeilenweise gelesen statt mit "." eingelesen: ein
+# Tippfehler darin soll den Anmeldebildschirm nicht verhindern.
+
+KONFIG=${QUERENCIA_ANMELDUNG_KONFIG:-/etc/querencia/greetd}
+REGREET=${QUERENCIA_ANMELDUNG_REGREET:-/usr/libexec/querencia-anmeldung/regreet}
+
+# wert <zeile>: Wert hinter dem ersten "=", ohne umschließende Anführungszeichen
+wert() {
+    v=${1#*=}
+    case $v in
+    \"*\") v=${v#\"}; v=${v%\"} ;;
+    \'*\') v=${v#\'}; v=${v%\'} ;;
+    esac
+    printf '%s' "$v"
+}
+
+if [ -r /etc/default/locale ]; then
+    while IFS= read -r zeile || [ -n "$zeile" ]; do
+        case $zeile in
+        LANG=* | LANGUAGE=* | LC_[A-Z]*=*)
+            name=${zeile%%=*}
+            case $name in *[!A-Z_]*) continue ;; esac
+            export "$name=$(wert "$zeile")" ;;
+        esac
+    done </etc/default/locale
+fi
+
+if [ -r /etc/default/keyboard ]; then
+    while IFS= read -r zeile || [ -n "$zeile" ]; do
+        case $zeile in
+        XKBMODEL=*) v=$(wert "$zeile"); [ -z "$v" ] || export XKB_DEFAULT_MODEL="$v" ;;
+        XKBLAYOUT=*) v=$(wert "$zeile"); [ -z "$v" ] || export XKB_DEFAULT_LAYOUT="$v" ;;
+        XKBVARIANT=*) v=$(wert "$zeile"); [ -z "$v" ] || export XKB_DEFAULT_VARIANT="$v" ;;
+        XKBOPTIONS=*) v=$(wert "$zeile"); [ -z "$v" ] || export XKB_DEFAULT_OPTIONS="$v" ;;
+        esac
+    done </etc/default/keyboard
+fi
+
+exec /usr/bin/dbus-run-session -- /usr/bin/labwc -C "$KONFIG/labwc" -S "$REGREET"

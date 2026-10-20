@@ -1,0 +1,7 @@
+# Umgebung des Compositors für den Anmeldebildschirm (Benutzer _greetd).
+# Nichts in die Aktivierungsumgebung von _greetd exportieren.
+LABWC_UPDATE_ACTIVATION_ENV=0
+# Zeiger wie in der Querencia-Sitzung (Paket dmz-cursor-theme); fehlt das
+# Thema, zeichnet labwc den Standardzeiger.
+XCURSOR_THEME=DMZ-White
+XCURSOR_SIZE=24

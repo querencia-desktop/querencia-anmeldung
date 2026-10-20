@@ -1,0 +1,7 @@
+# Erzeugnisse des Paketbaus (werkzeuge/paket-bauen.sh)
+/build/
+# Spiegel des Upstream-Repositorys von ReGreet (docs/building.md)
+/upstream/
+*.swp
+*~
+__pycache__/

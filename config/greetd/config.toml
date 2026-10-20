@@ -1,0 +1,16 @@
+# greetd-Konfiguration der Querencia Anmeldung.
+# Gelesen von /usr/sbin/querencia-anmeldung (greetd --config <diese Datei>);
+# die Konfiguration des Pakets greetd in /etc/greetd/ bleibt unberührt.
+
+[terminal]
+# Virtuelle Konsole des Anmeldebildschirms. 7 lässt tty1 für die
+# Text-Anmeldung frei (getty@tty1 läuft weiter).
+vt = 7
+
+[default_session]
+# Startet labwc ohne Menü und Tastenkürzel mit ReGreet als einzigem
+# Programm (siehe /usr/libexec/querencia-anmeldung/anmeldung-starten).
+command = "/usr/libexec/querencia-anmeldung/anmeldung-starten"
+
+# Systembenutzer des Anmeldebildschirms, angelegt vom Paket greetd.
+user = "_greetd"

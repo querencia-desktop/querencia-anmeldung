@@ -1,0 +1,39 @@
+# ReGreet-Konfiguration der Querencia Anmeldung.
+# ReGreet ist für dieses Paket mit GREETD_CONFIG_DIR=/etc/querencia/greetd
+# gebaut und liest deshalb diese Datei (und eine optionale regreet.css
+# daneben). Schlüssel und Vorgaben: /usr/share/doc/querencia-anmeldung/
+# examples/regreet.sample.toml.
+
+# Benutzer und Sitzung immer wählbar lassen.
+skip_selection = false
+
+[background]
+# Hintergrund „Querencia Blau“ aus dem Paket querencia-shell. Fehlt die
+# Datei, bleibt der Hintergrund einfarbig.
+path = "/usr/share/querencia/hintergruende/querencia-blau.png"
+fit = "Cover"
+
+[GTK]
+# Thema Querencia-Klassisch (querencia-shell), Symbolthema Querencia
+# (querencia-symbole), Zeiger DMZ wie in der Querencia-Sitzung. Fehlt
+# ein Thema, nimmt GTK seine Vorgabe.
+application_prefer_dark_theme = false
+theme_name = "Querencia-Klassisch"
+icon_theme_name = "Querencia"
+cursor_theme_name = "DMZ-White"
+cursor_blink = true
+font_name = "DejaVu Sans 11"
+
+[commands]
+reboot = ["systemctl", "reboot"]
+poweroff = ["systemctl", "poweroff"]
+
+[appearance]
+greeting_msg = "Querencia Desktop"
+
+[widget.clock]
+# Datum und Uhrzeit in der Systemsprache (/etc/default/locale, gesetzt
+# von anmeldung-starten) und der Systemzeitzone.
+format = "%A, %-d. %B %Y   %H:%M"
+resolution = "500ms"
+label_width = 320

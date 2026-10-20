@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!--
+  Leere Menüs für den Anmeldebildschirm. Ohne menu.xml legt labwc eigene
+  Ersatzmenüs an (Wurzelmenü mit „Terminal“ und „Exit“, Fenstermenü);
+  diese leeren Einträge verhindern das. Erreichbar wären die Menüs ohnehin
+  nicht (rc.xml löscht alle Bindungen), die Datei ist die zweite Sicherung.
+-->
+<openbox_menu>
+  <menu id="root-menu" label=""></menu>
+  <menu id="client-menu" label=""></menu>
+</openbox_menu>

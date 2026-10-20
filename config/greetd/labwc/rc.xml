@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+  labwc-Konfiguration des Anmeldebildschirms (Benutzer _greetd).
+  labwc dient nur als Compositor für ReGreet: Fensterrahmen zeichnet
+  ReGreet selbst, es gibt kein Menü, keine Tasten- und keine Mausbelegung.
+
+  Eine Bindung mit der Aktion None: labwc lädt seine Standardbelegung nur,
+  wenn gar keine Bindung definiert ist; None-Bindungen werden danach
+  gelöscht. Ergebnis: keine Tastenkürzel, keine Mausbelegung, kein
+  Wurzelmenü (auch das eingebaute Ersatzmenü ist nicht erreichbar).
+-->
+<labwc_config>
+  <core>
+    <decoration>client</decoration>
+    <gap>0</gap>
+  </core>
+  <keyboard>
+    <keybind key="XF86Launch9"><action name="None" /></keybind>
+  </keyboard>
+  <mouse>
+    <context name="Root">
+      <mousebind button="Right" action="Press"><action name="None" /></mousebind>
+    </context>
+  </mouse>
+</labwc_config>

@@ -1,0 +1,19 @@
+Querencia Anmeldung – Teil von Querencia Desktop
+Copyright (C) 2026 Querencia Desktop contributors
+
+This program is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License in
+the file LICENSE for more details.
+
+Fremdbestandteile: Das Paket querencia-anmeldung enthält zusätzlich ReGreet
+0.5.0 (https://github.com/rharish101/ReGreet, „The ReGreet Authors“,
+GPL-3.0-or-later; src/gui/model.rs und README.md zusätzlich MIT,
+Maximilian Moser; Build-Dateien 0BSD) und die Rust-Crates aus dessen
+Cargo.lock; Einzelheiten in debian/copyright des Pakets. greetd und labwc
+kommen aus den Distributionspaketen.

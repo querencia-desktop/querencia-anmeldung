@@ -1,0 +1,68 @@
+.TH QUERENCIA-ANMELDUNG 8 "2026-10-20" "querencia-anmeldung 0.1.0" "Querencia Desktop"
+.SH NAME
+querencia-anmeldung \- Anmeldebildschirm von Querencia Desktop (greetd mit ReGreet)
+.SH SYNOPSIS
+.B querencia-anmeldung
+.RI [ greetd-optionen ]
+.SH BESCHREIBUNG
+.B querencia-anmeldung
+startet
+.BR greetd (1)
+mit der Konfiguration
+.IR /etc/querencia/greetd/config.toml .
+greetd zeigt als Benutzer
+.B _greetd
+den grafischen Anmeldebildschirm ReGreet in einem
+.BR labwc (1)
+ohne Menü und Tastenkürzel. Zur Wahl stehen alle Sitzungen aus
+.I /usr/share/wayland-sessions
+und
+.IR /usr/share/xsessions ,
+also neben Querencia Desktop auch GNOME bzw. Ubuntu.
+.PP
+Das Programm wird nicht von Hand aufgerufen, sondern vom Dienst
+.BR querencia-anmeldung.service ,
+sobald dieser der Standard-Anmeldedienst ist
+.RI ( display-manager.service ).
+.SH STANDARD-ANMELDEDIENST
+Welcher Anmeldedienst beim Start läuft, steht wie bei gdm3 und lightdm in
+.I /etc/X11/default-display-manager
+und in der debconf-Frage
+.BR shared/default-x-display-manager .
+Bei der Installation wird die Querencia Anmeldung nur dann Standard, wenn
+noch kein anderer Anmeldedienst eingerichtet ist, wenn sie in der Frage
+gewählt wird oder wenn
+.B QUERENCIA_ANMELDUNG=ja
+gesetzt ist. Ein laufender Anmeldedienst wird nie angehalten; der Wechsel
+wirkt nach dem nächsten Neustart.
+.TP
+.B sudo dpkg-reconfigure querencia-anmeldung
+fragt nach dem Standard-Anmeldedienst (z.\~B. gdm3 oder querencia-anmeldung).
+.TP
+.B sudo QUERENCIA_ANMELDUNG=nein dpkg-reconfigure querencia-anmeldung
+schaltet ohne Frage zurück auf den zuvor aktiven bzw. einen anderen
+installierten Anmeldedienst.
+.PP
+Beim Entfernen des Pakets wird der vorherige Anmeldedienst (etwa GDM)
+wieder eingetragen.
+.SH DATEIEN
+.TP
+.I /etc/querencia/greetd/config.toml
+greetd-Konfiguration (Konsole 7, Benutzer _greetd).
+.TP
+.I /etc/querencia/greetd/regreet.toml
+Grußtext, Hintergrund, Thema, Uhr.
+.TP
+.I /etc/querencia/greetd/labwc/
+labwc-Konfiguration des Anmeldebildschirms.
+.TP
+.I /var/log/querencia-anmeldung/log
+Protokoll von ReGreet.
+.TP
+.I /var/lib/querencia-anmeldung/
+zuletzt gewählter Benutzer und Sitzung; Merker des vorherigen Anmeldedienstes.
+.SH SIEHE AUCH
+.BR greetd (1),
+.BR greetd (5),
+.BR labwc (1),
+.BR dpkg-reconfigure (8)

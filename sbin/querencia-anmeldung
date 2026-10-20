@@ -1,0 +1,7 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Display-Manager „Querencia Anmeldung“: greetd mit der Querencia-
+# Konfiguration. Gestartet vom Dienst querencia-anmeldung.service; der Name
+# dieses Programms steht in /etc/X11/default-display-manager, wenn die
+# Querencia Anmeldung der Standard-Anmeldedienst ist (querencia-anmeldung(8)).
+exec /usr/sbin/greetd --config /etc/querencia/greetd/config.toml "$@"
