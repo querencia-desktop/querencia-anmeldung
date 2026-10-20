@@ -185,7 +185,7 @@ pruefe "Hülle --ohne-variablen: keine Variablen, nur Exec" \
 A=$D/libexec/sitzungen-auswahl
 mkdir -p "$TMP/konfig" "$TMP/lauf" "$TMP/zustand"
 cp "$D/config/greetd/sitzungen.conf" "$TMP/konfig/sitzungen.conf"
-printf 'root:x:0:0::/root:/bin/bash\nuser:x:1000:1000::~:/bin/bash\nprobe:x:1001:1001::/home/probe:/bin/bash\ndienst:x:1002:1002::/:/usr/sbin/nologin\n' >"$TMP/passwd"
+printf 'root:x:0:0::/root:/bin/bash\nanna:x:1000:1000::/home/anna:/bin/bash\nprobe:x:1001:1001::/home/probe:/bin/bash\ndienst:x:1002:1002::/:/usr/sbin/nologin\n' >"$TMP/passwd"
 auswahl() {
     env QUERENCIA_ANMELDUNG_KONFIG="$TMP/konfig" QUERENCIA_ANMELDUNG_HUELLE="${HUELLE_TEST:-$H}" \
         QUERENCIA_ANMELDUNG_QUELLEN="$Q/lokal $Q/usr" QUERENCIA_ANMELDUNG_LAUFZEIT="$TMP/lauf" \
@@ -206,18 +206,18 @@ pruefe "Auswahl: Querencia startet über die Hülle" \
     "grep -qx 'Exec=$HUELLE_TEST $Q/usr/querencia.desktop' '$W/querencia.desktop'"
 pruefe "Auswahl: Name übernommen" "grep -qx 'Name=Querencia Desktop' '$W/querencia.desktop'"
 pruefe "Auswahl: Vorwahl für neue Benutzer" \
-    "grep -qx 'user = \"Querencia Desktop\"' '$TMP/zustand/state.toml' && grep -qx 'probe = \"Querencia Desktop\"' '$TMP/zustand/state.toml'"
+    "grep -qx 'anna = \"Querencia Desktop\"' '$TMP/zustand/state.toml' && grep -qx 'probe = \"Querencia Desktop\"' '$TMP/zustand/state.toml'"
 pruefe "Auswahl: keine Vorwahl für Systembenutzer" "! grep -q '^root\\|^dienst' '$TMP/zustand/state.toml'"
 pruefe "Auswahl: state.toml ist TOML" \
     "py 'import sys,tomllib; tomllib.load(open(sys.argv[1],\"rb\"))' '$TMP/zustand/state.toml'"
 printf 'freigeben = ubuntu labwc\nhuelle = ja\n' >"$TMP/konfig/sitzungen.conf"
-printf 'last_user = "user"\n\n[user_to_last_sess]\nuser = "labwc"\nprobe = "Ubuntu"\n' >"$TMP/zustand/state.toml"
+printf 'last_user = "anna"\n\n[user_to_last_sess]\nanna = "labwc"\nprobe = "Ubuntu"\n' >"$TMP/zustand/state.toml"
 auswahl
 pruefe "Auswahl Freigabe: Ubuntu angeboten" "[ -f '$W/ubuntu.desktop' ] && grep -qx 'Exec=$HUELLE_TEST $Q/usr/ubuntu.desktop' '$W/ubuntu.desktop'"
 pruefe "Auswahl Freigabe: labwc trotzdem nie" "[ ! -e '$W/labwc.desktop' ]"
 pruefe "Auswahl Freigabe: andere bleiben aus" "[ ! -e '$W/plasma.desktop' ]"
 pruefe "Auswahl: alte Sitzung labwc -> Querencia, gültige bleibt" \
-    "grep -qx 'user = \"Querencia Desktop\"' '$TMP/zustand/state.toml' && grep -qx 'probe = \"Ubuntu\"' '$TMP/zustand/state.toml' && grep -qx 'last_user = \"user\"' '$TMP/zustand/state.toml'"
+    "grep -qx 'anna = \"Querencia Desktop\"' '$TMP/zustand/state.toml' && grep -qx 'probe = \"Ubuntu\"' '$TMP/zustand/state.toml' && grep -qx 'last_user = \"anna\"' '$TMP/zustand/state.toml'"
 printf 'freigeben =\nhuelle = nein\n' >"$TMP/konfig/sitzungen.conf"
 auswahl
 pruefe "Auswahl huelle=nein: Querencia ohne Variablen" \

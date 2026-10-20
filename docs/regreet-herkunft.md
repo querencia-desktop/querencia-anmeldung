@@ -27,7 +27,7 @@ GPL-3.0-or-later passt zur Lizenz der Querencia-Programme (ENTSCHEIDUNGEN
 Nr. 1); MIT und 0BSD sind damit verträglich. Die Rust-Abhängigkeiten
 listet `debian/copyright` des Pakets (aus den vendorten `Cargo.toml`).
 
-## Der Bau vom 14.10.2026 (entwicklungs-vm)
+## Der Bau vom 14.10.2026 (Entwicklungs-VM)
 
 Der bisherige Anmeldebildschirm der Entwicklungs-VM nutzt
 `/usr/local/bin/regreet` (11 030 200 Byte, 14.10. 16:26). Gemessen am
@@ -47,5 +47,5 @@ Der bisherige Anmeldebildschirm der Entwicklungs-VM nutzt
   16:26 nach `/usr/local/bin` kopiert (Eigentümer root).
 
 Das Paket nimmt dieselbe Upstream-Version als Quelle (nicht das Binary
-von entwicklungs-vm); Unterschiede sind nur die Bauvariablen (eigene Pfade)
+von der Entwicklungs-VM); Unterschiede sind nur die Bauvariablen (eigene Pfade)
 und die Debian-Bauflags (Härtung, `--remap-path-prefix`).
