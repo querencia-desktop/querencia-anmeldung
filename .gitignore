@@ -5,3 +5,6 @@
 *.swp
 *~
 __pycache__/
+# Ausgaben der isolierten Prüfung (nicht einchecken)
+/target
+/nachweis/

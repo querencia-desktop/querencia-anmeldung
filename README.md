@@ -15,6 +15,26 @@ startet über die Sitzungshülle `sitzung-starten`, die
 GDM für die Bildschirmsperre: Auf einem Ubuntu Desktop bleibt GDM der
 Standard-Anmeldedienst und bietet GNOME und Querencia Desktop an.
 
+*English summary:* The graphical login screen of Querencia Desktop: greetd
+with the ReGreet greeter in a locked-down labwc. Part of Querencia Desktop, a
+classic GNOME-2-style desktop for Wayland. Alpha software; documentation is in
+German.
+
+> **Alpha.** Geprüft auf Wegwerf-VMs, noch nicht auf fremden Rechnern; GNOME
+> wird nur angeboten, wenn freigegeben (Bildschirmsperre braucht GDM). Keine
+> Sicherheits- oder Datenverlustgarantie.
+
+## Stand
+
+| | |
+|---|---|
+| Version | 0.1.1 (Tag `anmeldung/0.1.1`; Sitzungshülle, Sitzungsfilter, Vorwahl) |
+| Letzte Prüfung | 20.10.2026: `konfig-pruefen` 75/0, Umschaltung 30/0, Paketprüfung 236/0, Lintian ohne Fehler und Warnungen, Weg G der Prüfliste auf einer Test-VM bestanden (bekannte Grenze: GNOME-Sperre) |
+| Getestet auf | Ubuntu 26.04, greetd aus dem Archiv, labwc 0.9.8, ReGreet 0.5.0 |
+| Nicht getestet | andere Distributionen, Mehrmonitor, fremde Rechner |
+
+Änderungen: [CHANGELOG.md](CHANGELOG.md).
+
 ## Was in diesem Repository liegt
 
 Nur die Querencia-Teile; ReGreet selbst kommt unverändert aus dem
@@ -85,12 +105,29 @@ sh tests/konfig-pruefen.sh
 bash werkzeuge/paket-bauen.sh
 ```
 
-Bauanleitung: `docs/building.md`; Prüfliste für Test-VMs:
-`docs/pruefung-anmeldung.md`.
+Bauanleitung: [docs/building.md](docs/building.md); Prüfliste für Test-VMs:
+[docs/pruefung-anmeldung.md](docs/pruefung-anmeldung.md). Der Paketbau braucht
+zusätzlich das Repository `querencia-packaging` (Ordner
+`querencia-anmeldung/`). Arbeitsweise: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Lizenz
 
-GPL-3.0-or-later (`LICENSE`, Vermerk in `COPYRIGHT`). ReGreet steht
-ebenfalls unter GPL-3.0-or-later (einzelne Dateien zusätzlich MIT bzw.
-0BSD, siehe `docs/regreet-herkunft.md`).
+GPL-3.0-or-later, siehe [LICENSE](LICENSE) (reiner Lizenztext). Copyright 2026
+Querencia Desktop contributors; Urheber- und Fremdhinweise in
+[COPYRIGHT](COPYRIGHT).
 
+ReGreet 0.5.0 liegt nicht in diesem Repository; das Paket baut es unverändert
+aus der Upstream-Quelle. ReGreet steht unter GPL-3.0-or-later (einzelne
+Dateien zusätzlich MIT bzw. 0BSD, siehe
+[docs/regreet-herkunft.md](docs/regreet-herkunft.md)); wegen der Crate
+`greetd_ipc` (GPL-3.0-only) ist das gebaute ReGreet-Programm als Ganzes
+GPL-3.0. Die Lizenzen aller mitgebauten Crates stehen in `debian/copyright`
+des Pakets. greetd und labwc kommen aus den Distributionspaketen.
+
+Name und Logo „Querencia“ sind keine freien Inhalte: [MARKE.md](MARKE.md).
+
+## Fehler melden
+
+Fehler, Wünsche und Fragen zu Querencia gehen an die gemeinsame Meldestelle:
+<https://github.com/querencia-desktop/querencia/issues/new/choose>.
+Sicherheitslücken bitte nicht öffentlich melden, siehe [SECURITY.md](SECURITY.md).
