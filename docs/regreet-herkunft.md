@@ -23,8 +23,7 @@ ReGreet ist REUSE-konform:
 | `src/gui/model.rs`, `README.md` | GPL-3.0-or-later AND MIT (zusätzlich 2021 Maximilian Moser) |
 | `Cargo.toml`, `Cargo.lock`, `.gitignore`, `.pre-commit-config.yaml`, `systemd-tmpfiles.conf`, `.github/` | 0BSD |
 
-GPL-3.0-or-later passt zur Lizenz der Querencia-Programme (ENTSCHEIDUNGEN
-Nr. 1); MIT und 0BSD sind damit verträglich. Die Rust-Abhängigkeiten
+GPL-3.0-or-later passt zur Lizenz der Querencia-Programme; MIT und 0BSD sind damit verträglich. Die Rust-Abhängigkeiten
 listet `debian/copyright` des Pakets (aus den vendorten `Cargo.toml`).
 
 ## Der Bau vom 14.10.2026 (Entwicklungs-VM)

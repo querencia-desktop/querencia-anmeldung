@@ -6,6 +6,8 @@ Distribution) zeigt den GTK-4-Greeter [ReGreet](https://github.com/rharish101/Re
 in einem [labwc](https://labwc.github.io/) ohne Menü und Tastenkürzel –
 mit Grußtext „Querencia Desktop“, Thema Querencia-Klassisch, Symbolthema
 Querencia und dem Hintergrund „Querencia Blau“.
+Installiert wird es zusammen mit Querencia Desktop aus der APT-Quelle;
+Anleitung auf <https://querencialinux.org>.
 
 Zur Wahl steht **Querencia Desktop**. Andere Wayland-Sitzungen (etwa
 Ubuntu/GNOME) erscheinen erst, wenn sie in
