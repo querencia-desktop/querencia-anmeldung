@@ -47,7 +47,7 @@ Warum die Uhr englisch war: ReGreet nimmt die Sprache der Uhr aus
   Dienstes. Die Locale muss erzeugt sein (`locale -a`).
 - Uhr: `format = "%x %H:%M"` in `regreet.toml`; `%x` ist das Datum der
   Zeitsprache, deutsch „22.10.2026 02:54“ wie im Panel, englisch (USA)
-  „10/22/26 02:54“.
+  „10/22/2026 02:54“.
 - PAM: greetd setzt keine Sprache, deshalb kommen die Aufforderungen von
   `pam_unix` englisch („Password:“); `po/de.po` übersetzt die üblichen.
 - Info-Zeile: `anmeldung-starten` hängt die Ausgabe aus

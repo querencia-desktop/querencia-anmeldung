@@ -66,7 +66,9 @@ ist der Dateiname des Belegs. Passwörter nicht in Belege schreiben.
 ## Ü Sprache und Info-Zeile (ab 0.1.2, beide Wege)
 
 Systemsprache Deutsch: `/etc/default/locale` mit `LANG=de_DE.UTF-8`, die
-Locale erzeugt (`locale -a` zeigt `de_DE.utf8`).
+Locale erzeugt (`locale -a` zeigt `de_DE.utf8`). Unter Ubuntu 26.04 ist
+`/etc/default/locale` ein Link auf `/etc/locale.conf`: Sprache nur mit
+`localectl set-locale` ändern, nicht die Datei ersetzen.
 
 | Nr. | Schritt | Erwartung |
 |---|---|---|
@@ -75,7 +77,7 @@ Locale erzeugt (`locale -a` zeigt `de_DE.utf8`).
 | Ü3 | falsches Passwort | Meldung „Falsches Passwort. Bitte erneut versuchen.“; im Protokoll `Error from greetd: … AUTH_ERR` |
 | Ü4 | Uhr | Datum und Zeit wie im Panel, z. B. „22.10.2026 02:54“ |
 | Ü5 | `printf 'Alpha 2.1\n' \| sudo tee /usr/share/querencia/version` (nur ohne Metapaket ab Alpha 2.1), Anmeldebildschirm neu (`sudo systemctl restart display-manager` von tty1 aus) | Grußtext „Querencia Desktop Alpha 2.1“; ohne Datei nur „Querencia Desktop“ |
-| Ü6 | Gegenprobe Englisch: `LANG=en_US.UTF-8` in `/etc/default/locale`, Anmeldebildschirm neu | „User:“, „Login“, „Reboot“, „Power Off“; Uhr „10/22/26 02:54“ |
+| Ü6 | Gegenprobe Englisch: `sudo localectl set-locale LANG=en_US.UTF-8`, Anmeldebildschirm neu; danach `sudo localectl set-locale LANG=de_DE.UTF-8` | „User:“, „Login“, „Reboot“, „Power Off“, „Wrong password. Please try again.“; Uhr „10/22/2026 02:54“ |
 
 ## Belege und Rückmeldung
 

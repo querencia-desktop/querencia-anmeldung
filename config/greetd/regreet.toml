@@ -38,7 +38,7 @@ greeting_msg = "Querencia Desktop"
 # Datum und Uhrzeit in der Zeitsprache des Systems (LC_TIME bzw. LANG aus
 # /etc/default/locale, gesetzt von anmeldung-starten) und der
 # Systemzeitzone. %x ist das Datum dieser Sprache, deutsch „22.10.2026“
-# wie im Panel, englisch (USA) „10/22/26“.
+# wie im Panel, englisch (USA) „10/22/2026“.
 format = "%x %H:%M"
 resolution = "500ms"
 label_width = 320
