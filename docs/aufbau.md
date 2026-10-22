@@ -9,7 +9,8 @@ systemd
                  ├─ sitzungen-auswahl → /run/querencia-anmeldung/wayland-sessions
                  └─ dbus-run-session -- labwc -C /etc/querencia/greetd/labwc -S regreet
                      └─ /usr/libexec/querencia-anmeldung/regreet (ohne XDG_DATA_DIRS)
-                         liest /etc/querencia/greetd/regreet.toml
+                         liest /etc/querencia/greetd/regreet.toml (mit
+                         Versionsdatei die Kopie in /run/querencia-anmeldung)
                          Sitzungen: nur /run/querencia-anmeldung/wayland-sessions
 ```
 
@@ -27,7 +28,8 @@ unverändert; `DesktopNames` liest es nicht. Es sucht Sitzungen in
 `$XDG_DATA_DIRS/{xsessions,wayland-sessions}`, wenn die Variable gesetzt
 ist, sonst im eingebauten `SESSION_DIRS`. Die Querencia Anmeldung baut
 ReGreet deshalb mit `SESSION_DIRS=/run/querencia-anmeldung/wayland-sessions`
-und startet es ohne `XDG_DATA_DIRS`; ReGreet selbst bleibt unverändert.
+und startet es ohne `XDG_DATA_DIRS`; dafür braucht ReGreet keinen Patch
+(der einzige Patch betrifft Übersetzung und Uhr, `docs/uebersetzung.md`).
 
 `sitzungen-auswahl` füllt diesen Ordner bei jedem Erscheinen des
 Anmeldebildschirms aus `/usr/local/share/wayland-sessions` und
@@ -78,6 +80,11 @@ GNOME bleibt GDM Standard-Anmeldedienst.
 vier Variablen) – Rückfall, falls eine Sitzung mit den Variablen nicht
 zurechtkommt. In ReGreet bleibt die Eingabe eines eigenen Befehls möglich
 (Stift-Knopf neben der Sitzung); dieser Weg umgeht Auswahl und Hülle.
+Er bleibt bewusst (Entscheidung der Startsession vom 22.10.2026): Wer dort
+einen Befehl eingibt, muss sich trotzdem mit Passwort anmelden und startet
+ihn dann nur als der angemeldete Benutzer – dasselbe, was er nach der
+Anmeldung in einem Terminal könnte; ein Patch dafür wäre zusätzlicher
+Umfang an ReGreet.
 
 ## Pfade
 
@@ -90,6 +97,8 @@ zurechtkommt. In ReGreet bleibt die Eingabe eines eigenen Befehls möglich
 | `/etc/querencia/greetd/labwc/{rc.xml,menu.xml,environment}` | labwc ohne Bindungen und mit leeren Menüs, Zeiger DMZ | Conffiles |
 | `/usr/libexec/querencia-anmeldung/regreet` | ReGreet 0.5.0, gebaut mit den Pfaden dieser Tabelle | Paket |
 | `/usr/libexec/querencia-anmeldung/{sitzungen-auswahl,sitzung-starten}` | Sitzungsliste und Sitzungshülle | Paket |
+| `/run/querencia-anmeldung/regreet.toml` | Kopie von `regreet.toml` mit Info-Zeile im Grußtext, nur mit Versionsdatei | `anmeldung-starten` (`_greetd`) |
+| `/usr/share/locale/de/LC_MESSAGES/querencia-anmeldung.mo` | deutsche Texte des Anmeldebildschirms | Paket |
 | `/run/querencia-anmeldung/wayland-sessions/`, `auswahl.txt` | Sitzungsliste für ReGreet, Begründung je Datei | `sitzungen-auswahl` (`_greetd`) |
 | `/var/lib/querencia-anmeldung/state.toml` | zuletzt gewählter Benutzer und Sitzung | ReGreet (`_greetd`) |
 | `/var/log/querencia-anmeldung/log` | Protokoll von ReGreet | ReGreet (`_greetd`) |

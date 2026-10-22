@@ -3,5 +3,6 @@
 # security); begründete Ausnahmen stehen nur als Kommentar hier.
 #
 # S004 config/greetd/regreet.toml: deutsche Anführungszeichen („Querencia
-#      Blau“) im Kommentar folgen der Typografie der übrigen Querencia-Doku
+#      Blau“, „Querencia Desktop Alpha 2.1“, „22.10.2026“; seit 0.1.2) im
+#      Kommentar folgen der Typografie der übrigen Querencia-Doku
 #      (Projektstil, nicht global ersetzen).

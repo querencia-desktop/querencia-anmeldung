@@ -1,0 +1,74 @@
+# Deutsche Übersetzung des Anmeldebildschirms von Querencia Desktop.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Die englischen Quelltexte stehen in ReGreet 0.5.0 und im Patch
+# debian/patches/0001-gettext-uhr-nach-lc-time.patch des Pakets
+# querencia-anmeldung (Aufrufe tr("...")); tests/uebersetzung-pruefen.sh
+# gleicht beide ab. Die Eingabeaufforderungen von PAM kommen aus greetd
+# ohne Spracheinstellung immer englisch und werden hier mit übersetzt.
+msgid ""
+msgstr ""
+"Project-Id-Version: querencia-anmeldung 0.1.2\n"
+"PO-Revision-Date: 2026-10-22 03:30+0200\n"
+"Last-Translator: pottrauschen\n"
+"Language-Team: Deutsch\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "User:"
+msgstr "Benutzer:"
+
+msgid "Session:"
+msgstr "Sitzung:"
+
+msgid "Manually enter username"
+msgstr "Benutzernamen eingeben"
+
+msgid "Manually enter session command"
+msgstr "Sitzungsbefehl eingeben"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Login"
+msgstr "Anmelden"
+
+msgid "Reboot"
+msgstr "Neu starten"
+
+msgid "Power Off"
+msgstr "Ausschalten"
+
+msgid "Invalid session command"
+msgstr "Ungültiger Sitzungsbefehl"
+
+msgid "Wrong password. Please try again."
+msgstr "Falsches Passwort. Bitte erneut versuchen."
+
+msgid "Login failed:"
+msgstr "Anmeldung fehlgeschlagen:"
+
+msgid "Session not found"
+msgstr "Sitzung nicht gefunden"
+
+msgid "No session or login shell found"
+msgstr "Keine Sitzung und keine Anmelde-Shell gefunden"
+
+msgid "Failed to start session"
+msgstr "Die Sitzung konnte nicht gestartet werden"
+
+# Eingabeaufforderungen von PAM (pam_unix), ohne Leerzeichen am Ende
+msgid "Password:"
+msgstr "Passwort:"
+
+msgid "Current password:"
+msgstr "Aktuelles Passwort:"
+
+msgid "New password:"
+msgstr "Neues Passwort:"
+
+msgid "Retype new password:"
+msgstr "Neues Passwort wiederholen:"

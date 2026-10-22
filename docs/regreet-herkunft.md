@@ -13,6 +13,15 @@
 | Rust | Edition 2024, `rust-version = "1.85"`; Bau mit rustc 1.93.1 der Distribution |
 | Abhängigkeiten | GTK 4 (≥ 4.16 wegen glycin), glycin 3.0.8 (Bilder; zur Laufzeit `glycin-loaders`), relm4 0.10, greetd_ipc 0.10, zbus 5 |
 
+## Patch
+
+Seit 0.1.2 wendet das Paket einen DEP-3-Patch an
+(`debian/patches/0001-gettext-uhr-nach-lc-time.patch` in
+`querencia-packaging/querencia-anmeldung/`): sichtbare Texte über gettext,
+Sprache der Uhr aus `LC_TIME`. Einzelheiten und Begründung:
+`docs/uebersetzung.md`. Spiegel und Hauptarchiv bleiben der unveränderte
+Tag `0.5.0`.
+
 ## Lizenz
 
 ReGreet ist REUSE-konform:

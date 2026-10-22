@@ -17,12 +17,14 @@ Standard-Anmeldedienst und bietet GNOME und Querencia Desktop an.
 
 ## Was in diesem Repository liegt
 
-Nur die Querencia-Teile; ReGreet selbst kommt unverändert aus dem
-Upstream-Release 0.5.0 und wird erst beim Paketbau dazugelegt
-(`docs/regreet-herkunft.md`).
+Nur die Querencia-Teile; ReGreet selbst kommt aus dem Upstream-Release
+0.5.0 und wird erst beim Paketbau dazugelegt (`docs/regreet-herkunft.md`).
+Ein einziger, kleiner Patch im Packaging übersetzt seine sichtbaren Texte
+und stellt die Uhr auf die Zeitsprache des Systems (`docs/uebersetzung.md`).
 
 | Ordner | Inhalt | installiert nach |
 |---|---|---|
+| `po/de.po` | deutsche Übersetzung der Texte von ReGreet | `/usr/share/locale/de/LC_MESSAGES/querencia-anmeldung.mo` |
 | `config/greetd/` | greetd- und ReGreet-Konfiguration, labwc-Konfiguration des Anmeldebildschirms | `/etc/querencia/greetd/` |
 | `sbin/querencia-anmeldung` | startet greetd mit dieser Konfiguration | `/usr/sbin/` |
 | `libexec/anmeldung-starten` | Befehl des Anmeldebildschirms: Sitzungsauswahl, Sprache und Tastatur des Systems, dann labwc + ReGreet | `/usr/libexec/querencia-anmeldung/` |
@@ -32,6 +34,7 @@ Upstream-Release 0.5.0 und wird erst beim Paketbau dazugelegt
 | `tmpfiles/` | Zustands- und Protokollordner von ReGreet | `/usr/lib/tmpfiles.d/` |
 | `man/querencia-anmeldung.8` | Handbuchseite | `/usr/share/man/man8/` |
 | `tests/konfig-pruefen.sh` | statische Prüfung (läuft auch beim Paketbau) | – |
+| `tests/uebersetzung-pruefen.sh` | Texte des gepatchten ReGreet gegen `po/de.po` (läuft beim Paketbau) | – |
 | `werkzeuge/paket-bauen.sh` | baut das Debian-Paket nach `build/` | – |
 
 Das Debian-Paket `querencia-anmeldung` (`debian/`, debconf-Umschaltung)

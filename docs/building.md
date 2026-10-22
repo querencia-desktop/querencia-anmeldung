@@ -9,7 +9,7 @@ Quellbaum des Pakets:
 | `./` | `querencia-anmeldung_<ver>.orig.tar.xz` | ReGreet, Commit des Tags `0.5.0` aus dem Spiegel `upstream/regreet.git` (Zeile in `quellen.conf`) |
 | `querencia/` | `…orig-querencia.tar.xz` | dieses Repository, Commit aus `querencia-anmeldung/komponenten.conf` |
 | `cargo-vendor/` | `…orig-cargo-vendor.tar.xz` | alle Crates aus ReGreets `Cargo.lock` (`cargo vendor --locked`) |
-| `debian/` | `…debian.tar.xz` | `querencia-packaging/querencia-anmeldung/debian/` |
+| `debian/` | `…debian.tar.xz` | `querencia-packaging/querencia-anmeldung/debian/`, mit dem einzigen Patch an ReGreet in `debian/patches/` (`docs/uebersetzung.md`) |
 
 ## Spiegel anlegen
 
