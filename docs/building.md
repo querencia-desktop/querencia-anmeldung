@@ -16,7 +16,7 @@ Quellbaum des Pakets:
 Einmalig, dann nur für neue Upstream-Fassungen auffrischen:
 
 ```bash
-cd ~/projects/querencia-anmeldung && git clone --bare https://github.com/rharish101/ReGreet.git upstream/regreet.git
+cd querencia-anmeldung && git clone --bare https://github.com/rharish101/ReGreet.git upstream/regreet.git
 ```
 
 Vor dem Eintrag eines neuen Tags den Commit gegen GitHub prüfen:
@@ -38,7 +38,7 @@ Eine neue Fassung neben der vorigen bauen (die vorige `.deb` bleibt als
 Rückfall liegen), mit dem Packaging-Worktree der Fassung:
 
 ```bash
-QUERENCIA_PACKAGING=~/projects/querencia-packaging-wt-anm2 QUERENCIA_ANMELDUNG_AUSGABE=~/projects/querencia-anmeldung/build/0.1.1 bash werkzeuge/paket-bauen.sh
+QUERENCIA_PACKAGING=../querencia-packaging QUERENCIA_ANMELDUNG_AUSGABE="$PWD/build/0.1.1" bash werkzeuge/paket-bauen.sh
 ```
 
 Das Skript ruft `orig-erzeugen.sh` (Archive, Vendoring, `debian/copyright`)
@@ -60,15 +60,15 @@ Die Pfade, die ReGreet beim Bau übernimmt, stehen in `debian/rules`
 ## Prüfen
 
 ```bash
-cd ~/projects/querencia-packaging-wt-anm1 && bash werkzeuge/pakete-pruefen.sh ~/projects/querencia-anmeldung/build/debs/*.deb
+cd ../querencia-packaging && bash werkzeuge/pakete-pruefen.sh ../querencia-anmeldung/build/debs/*.deb
 ```
 
 ```bash
-lintian -i -I --show-overrides ~/projects/querencia-anmeldung/build/debs/*.deb
+lintian -i -I --show-overrides build/debs/*.deb
 ```
 
 ```bash
-cd ~/projects/querencia-packaging-wt-anm1 && bash tests/anmeldung-umschalten.sh
+cd ../querencia-packaging && bash tests/anmeldung-umschalten.sh
 ```
 
 Die Funktion am Bildschirm prüft nur eine Test-VM:

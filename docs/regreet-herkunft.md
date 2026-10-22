@@ -32,13 +32,12 @@ ReGreet ist REUSE-konform:
 | `src/gui/model.rs`, `README.md` | GPL-3.0-or-later AND MIT (zusätzlich 2021 Maximilian Moser) |
 | `Cargo.toml`, `Cargo.lock`, `.gitignore`, `.pre-commit-config.yaml`, `systemd-tmpfiles.conf`, `.github/` | 0BSD |
 
-GPL-3.0-or-later passt zur Lizenz der Querencia-Programme (ENTSCHEIDUNGEN
-Nr. 1); MIT und 0BSD sind damit verträglich. Die Rust-Abhängigkeiten
+GPL-3.0-or-later passt zur Lizenz der Querencia-Programme; MIT und 0BSD sind damit verträglich. Die Rust-Abhängigkeiten
 listet `debian/copyright` des Pakets (aus den vendorten `Cargo.toml`).
 
-## Der Bau vom 14.10.2026 (Entwicklungs-VM)
+## Der Bau vom 14.10.2026 (Entwicklungsumgebung)
 
-Der bisherige Anmeldebildschirm der Entwicklungs-VM nutzt
+Der bisherige Anmeldebildschirm der Entwicklungsumgebung nutzt
 `/usr/local/bin/regreet` (11 030 200 Byte, 14.10. 16:26). Gemessen am
 20.10.:
 
@@ -56,5 +55,5 @@ Der bisherige Anmeldebildschirm der Entwicklungs-VM nutzt
   16:26 nach `/usr/local/bin` kopiert (Eigentümer root).
 
 Das Paket nimmt dieselbe Upstream-Version als Quelle (nicht das Binary
-von der Entwicklungs-VM); Unterschiede sind nur die Bauvariablen (eigene Pfade)
+von der Entwicklungsumgebung); Unterschiede sind nur die Bauvariablen (eigene Pfade)
 und die Debian-Bauflags (Härtung, `--remap-path-prefix`).

@@ -1,7 +1,7 @@
 # Prüfliste Anmeldebildschirm (Test-VMs)
 
 Funktionale Prüfung des Pakets `querencia-anmeldung` **nur auf Test-VMs**,
-nie auf der Entwicklungs-VM mit dem laufenden Anmeldebildschirm. Zwei Wege:
+nie in der Entwicklungsumgebung mit dem laufenden Anmeldebildschirm. Zwei Wege:
 
 - **Weg G (GDM):** Ubuntu Desktop 26.04 mit GNOME und GDM, Querencia
   Desktop schon installiert (Koexistenz, z. B. VM 116).
@@ -41,7 +41,7 @@ ist der Dateiname des Belegs. Passwörter nicht in Belege schreiben.
 | G12 | in GNOME abmelden | Querencia-Anmeldebildschirm erscheint wieder (kein schwarzer Bildschirm), „Ubuntu“ und der Benutzer sind vorbelegt |
 | G12a | Freigabe zurücknehmen: `sudo sed -i 's/^freigeben =.*/freigeben =/' /etc/querencia/greetd/sitzungen.conf`, Neustart | nur „Querencia Desktop“, vorgewählt, obwohl zuletzt „Ubuntu“ gewählt war (`/var/lib/querencia-anmeldung/state.toml`) |
 | G13 | Anmelden mit „Querencia Desktop“ | Panel, Desktop, Hintergrund wie gewohnt; `echo $XDG_CURRENT_DESKTOP $XDG_SESSION_DESKTOP $DESKTOP_SESSION` → `X-Querencia querencia querencia` (wie unter GDM) |
-| G14 | in Querencia abmelden und **sofort** wieder anmelden (unter 10 s) | Sitzung kommt vollständig (QD-062-Gegenprobe unter greetd) |
+| G14 | in Querencia abmelden und **sofort** wieder anmelden (unter 10 s) | Sitzung kommt vollständig (Gegenprobe zum schwarzen Bildschirm nach schneller Neuanmeldung, unter greetd) |
 | G15 | Protokolle: `sudo tail -50 /var/log/querencia-anmeldung/log; journalctl -b -u querencia-anmeldung --no-pager \| tail -30` | keine `ERROR`-Zeilen außer bekannten Hinweisen; Hintergrund geladen (keine glycin-Fehler) |
 | G16 | Knopf „Neu starten“ im Anmeldebildschirm | System startet neu, Querencia-Anmeldebildschirm erscheint wieder |
 | G17 | Zurück zu GDM: `sudo dpkg-reconfigure querencia-anmeldung`, `gdm3` wählen (alternativ `sudo QUERENCIA_ANMELDUNG=nein dpkg-reconfigure querencia-anmeldung`) | wie 0.3: `/usr/sbin/gdm3`, `…/gdm3.service`; die laufende Anmeldung bleibt |

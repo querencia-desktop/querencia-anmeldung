@@ -80,7 +80,7 @@ GNOME bleibt GDM Standard-Anmeldedienst.
 vier Variablen) – Rückfall, falls eine Sitzung mit den Variablen nicht
 zurechtkommt. In ReGreet bleibt die Eingabe eines eigenen Befehls möglich
 (Stift-Knopf neben der Sitzung); dieser Weg umgeht Auswahl und Hülle.
-Er bleibt bewusst (Entscheidung der Startsession vom 22.10.2026): Wer dort
+Er bleibt bewusst (Entscheidung vom 22.10.2026): Wer dort
 einen Befehl eingibt, muss sich trotzdem mit Passwort anmelden und startet
 ihn dann nur als der angemeldete Benutzer – dasselbe, was er nach der
 Anmeldung in einem Terminal könnte; ein Patch dafür wäre zusätzlicher

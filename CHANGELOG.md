@@ -2,12 +2,12 @@
 
 ## 0.1.2 – 22.10.2026
 
-- Anmeldebildschirm in der Systemsprache (QD-107): Beschriftungen,
+- Anmeldebildschirm in der Systemsprache: Beschriftungen,
   Knöpfe, Tooltips, Passwortabfrage und Fehlermeldungen über gettext,
   deutsche Übersetzung `po/de.po` (Domäne `querencia-anmeldung`).
   Falsches Passwort: „Falsches Passwort. Bitte erneut versuchen.“ statt
   „Login failed: Pam_authenticate: AUTH_ERR“. Dafür ein DEP-3-Patch an
-  ReGreet im Packaging (Entscheidung der Startsession vom 22.10.2026),
+  ReGreet im Packaging (Entscheidung vom 22.10.2026),
   ohne neue Crates.
 - Uhr in der Zeitsprache (`LC_TIME`): Format `%x %H:%M`, deutsch
   „22.10.2026 02:54“ wie im Panel. Vorher blieb die Uhr englisch, weil
@@ -53,5 +53,5 @@
   `display-manager.service`) und Programm `querencia-anmeldung` (greetd mit
   `/etc/querencia/greetd/config.toml`); die greetd-Konfiguration der
   Distribution bleibt unberührt.
-- Löst den von Hand eingerichteten Anmeldebildschirm der Entwicklungs-VM
+- Löst den von Hand eingerichteten Anmeldebildschirm der Entwicklungsumgebung
   ab (Grußtext „Classic2“, ReGreet und labwc unter `/usr/local/bin`).

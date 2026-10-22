@@ -8,7 +8,7 @@ Mitgeliefert ist Deutsch, Quelltext ist Englisch.
 ReGreet 0.5.0 hat keine Übersetzungen; seine Texte stehen englisch im
 Quelltext. Das Paket wendet deshalb einen einzigen DEP-3-Patch an:
 `querencia-packaging/querencia-anmeldung/debian/patches/0001-gettext-uhr-nach-lc-time.patch`
-(Quellformat `3.0 (quilt)`). Entschieden hat das die Startsession am
+(Quellformat `3.0 (quilt)`). So entschieden am
 22.10.2026; vorher galt „ReGreet nicht patchen“.
 
 | Datei in ReGreet | Änderung |
