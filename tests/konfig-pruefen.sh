@@ -88,11 +88,13 @@ XKBOPTIONS=""
 BACKSPACE="guess"
 EOT
 sed -e "s|/etc/default/locale|$TMP/locale|g" -e "s|/etc/default/keyboard|$TMP/keyboard|g" \
-    -e 's|^exec .*|env; echo "ARGS $KONFIG $REGREET"|' "$D/libexec/anmeldung-starten" >"$TMP/starten"
+    -e 's|^exec .*|env; echo "ARGS $KONFIG $REGREET$REGREET_KONFIG"|' "$D/libexec/anmeldung-starten" >"$TMP/starten"
 printf '#!/bin/sh\necho AUSWAHL-LIEF\n' >"$TMP/auswahl-attrappe"
 chmod 755 "$TMP/auswahl-attrappe"
+mkdir -p "$TMP/lauf"
 env -i PATH=/usr/bin:/bin XDG_DATA_DIRS=/x QUERENCIA_ANMELDUNG_AUSWAHL="$TMP/auswahl-attrappe" \
-    sh "$TMP/starten" >"$TMP/env" 2>&1
+    QUERENCIA_ANMELDUNG_RELEASE="$TMP/fehlt" QUERENCIA_ANMELDUNG_VERSION="$TMP/fehlt" \
+    QUERENCIA_ANMELDUNG_LAUFZEIT="$TMP/lauf" sh "$TMP/starten" >"$TMP/env" 2>&1
 pruefe "starten: LANG" "grep -qx 'LANG=de_DE.UTF-8' '$TMP/env'"
 pruefe "starten: LANGUAGE" "grep -qx 'LANGUAGE=de:en' '$TMP/env'"
 pruefe "starten: LC_TIME" "grep -qx 'LC_TIME=de_DE.UTF-8' '$TMP/env'"
@@ -101,7 +103,36 @@ pruefe "starten: XKB-Belegung" "grep -qx 'XKB_DEFAULT_LAYOUT=de' '$TMP/env' && g
 pruefe "starten: leere XKB-Werte nicht gesetzt" "! grep -q '^XKB_DEFAULT_OPTIONS=' '$TMP/env'"
 pruefe "starten: Pfade" "grep -qx 'ARGS /etc/querencia/greetd /usr/libexec/querencia-anmeldung/regreet' '$TMP/env'"
 pruefe "starten: exec labwc -S regreet ohne XDG_DATA_DIRS" \
-    "grep -q '^exec /usr/bin/dbus-run-session -- /usr/bin/labwc -C \"\$KONFIG/labwc\" -S \"/usr/bin/env -u XDG_DATA_DIRS \$REGREET\"\$' '$D/libexec/anmeldung-starten'"
+    "grep -q '^exec /usr/bin/dbus-run-session -- /usr/bin/labwc -C \"\$KONFIG/labwc\" -S \"/usr/bin/env -u XDG_DATA_DIRS \$REGREET\$REGREET_KONFIG\"\$' '$D/libexec/anmeldung-starten'"
+pruefe "starten: ohne Versionsdatei keine Kopie der Konfiguration" "[ ! -e '$TMP/lauf/regreet.toml' ]"
+pruefe "starten: Standardpfade der Versionsdatei" \
+    "grep -q 'RELEASE:-/usr/share/querencia/release}' '$D/libexec/anmeldung-starten' && grep -q 'VERSION:-/usr/share/querencia/version}' '$D/libexec/anmeldung-starten'"
+
+# Info-Zeile: Ausgabe aus release (VERSION), sonst aus version
+starten_mit() {
+    env -i PATH=/usr/bin:/bin QUERENCIA_ANMELDUNG_AUSWAHL="$TMP/auswahl-attrappe" \
+        QUERENCIA_ANMELDUNG_KONFIG="$D/config/greetd" QUERENCIA_ANMELDUNG_LAUFZEIT="$TMP/lauf" \
+        QUERENCIA_ANMELDUNG_RELEASE="$1" QUERENCIA_ANMELDUNG_VERSION="$2" sh "$TMP/starten" 2>&1 | grep '^ARGS '
+}
+printf 'NAME="Querencia Desktop"\nVERSION="Alpha 2.1"\nVERSION_ID="0.1.0~alpha2.1"\n' >"$TMP/release"
+printf 'Alpha 9\n' >"$TMP/version"
+printf '  Alpha "3" \\ & /x\n' >"$TMP/version-sonderzeichen"
+starten_mit "$TMP/release" "$TMP/version" >"$TMP/args"
+pruefe "info: release hat Vorrang, ReGreet liest die Kopie" \
+    "grep -qx 'ARGS $D/config/greetd /usr/libexec/querencia-anmeldung/regreet --config $TMP/lauf/regreet.toml' '$TMP/args' && [ \"\$(wert '$TMP/lauf/regreet.toml' appearance.greeting_msg)\" = 'Querencia Desktop Alpha 2.1' ]"
+pruefe "info: Kopie sonst gleich" \
+    "diff '$D/config/greetd/regreet.toml' '$TMP/lauf/regreet.toml' | grep -c '^[<>]' | grep -qx 2"
+starten_mit "$TMP/fehlt" "$TMP/version" >"$TMP/args"
+pruefe "info: ohne release erste Zeile von version" \
+    "[ \"\$(wert '$TMP/lauf/regreet.toml' appearance.greeting_msg)\" = 'Querencia Desktop Alpha 9' ]"
+starten_mit "$TMP/fehlt" "$TMP/version-sonderzeichen" >"$TMP/args"
+printf 'Querencia Desktop Alpha "3" \\ & /x\n' >"$TMP/erwartet"
+pruefe "info: Sonderzeichen bleiben gültiges TOML" \
+    "wert '$TMP/lauf/regreet.toml' appearance.greeting_msg | cmp -s - '$TMP/erwartet'"
+printf '\n' >"$TMP/version-leer"
+starten_mit "$TMP/fehlt" "$TMP/version-leer" >"$TMP/args"
+pruefe "info: leere Versionsdatei = keine Info-Zeile" \
+    "grep -qx 'ARGS $D/config/greetd /usr/libexec/querencia-anmeldung/regreet' '$TMP/args' && [ ! -e '$TMP/lauf/regreet.toml' ]"
 pruefe "starten: XDG_DATA_DIRS entfernt" "! grep -q '^XDG_DATA_DIRS=' '$TMP/env'"
 pruefe "starten: Sitzungsauswahl läuft vorher" "grep -qx AUSWAHL-LIEF '$TMP/env'"
 pruefe "starten: Standardpfad der Auswahl" \

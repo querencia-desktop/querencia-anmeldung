@@ -57,5 +57,37 @@ if [ -r /etc/default/keyboard ]; then
     done </etc/default/keyboard
 fi
 
+# Info-Zeile: Der Grußtext bekommt die Ausgabe von Querencia Desktop
+# (z. B. „Querencia Desktop Alpha 2.1“) aus der Versionsdatei des
+# Metapakets: VERSION aus /usr/share/querencia/release, sonst die erste
+# Zeile von /usr/share/querencia/version. Fehlen beide, bleibt der Grußtext
+# unverändert und ReGreet liest regreet.toml direkt. Sonst liest ReGreet
+# eine Kopie in /run/querencia-anmeldung, in der nur greeting_msg ergänzt
+# ist. Die beiden Variablen der Pfade sind nur für tests/konfig-pruefen.sh.
+RELEASE=${QUERENCIA_ANMELDUNG_RELEASE:-/usr/share/querencia/release}
+VERSION=${QUERENCIA_ANMELDUNG_VERSION:-/usr/share/querencia/version}
+LAUFZEIT=${QUERENCIA_ANMELDUNG_LAUFZEIT:-/run/querencia-anmeldung}
+ausgabe=
+if [ -r "$RELEASE" ]; then
+    while IFS= read -r zeile || [ -n "$zeile" ]; do
+        case $zeile in VERSION=*) ausgabe=$(wert "$zeile") ;; esac
+    done <"$RELEASE"
+fi
+if [ -z "$ausgabe" ] && [ -r "$VERSION" ]; then
+    IFS= read -r ausgabe <"$VERSION" || [ -n "$ausgabe" ]
+fi
+# nur druckbare Zeichen, Rand ohne Leerraum, für TOML \ und " maskiert
+ausgabe=$(printf '%s' "$ausgabe" | tr -d '[:cntrl:]' |
+    sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/[\\"]/\\&/g')
+REGREET_KONFIG=
+rm -f "$LAUFZEIT/regreet.toml"
+if [ -n "$ausgabe" ] && [ -r "$KONFIG/regreet.toml" ] &&
+    sed -e "s/^\([[:space:]]*greeting_msg[[:space:]]*=[[:space:]]*\"[^\"]*\)\"[[:space:]]*\$/\1 $(printf '%s' "$ausgabe" | sed -e 's/[\\&/]/\\&/g')\"/" \
+        "$KONFIG/regreet.toml" >"$LAUFZEIT/regreet.toml" 2>/dev/null; then
+    REGREET_KONFIG=" --config $LAUFZEIT/regreet.toml"
+else
+    rm -f "$LAUFZEIT/regreet.toml"
+fi
+
 unset XDG_DATA_DIRS
-exec /usr/bin/dbus-run-session -- /usr/bin/labwc -C "$KONFIG/labwc" -S "/usr/bin/env -u XDG_DATA_DIRS $REGREET"
+exec /usr/bin/dbus-run-session -- /usr/bin/labwc -C "$KONFIG/labwc" -S "/usr/bin/env -u XDG_DATA_DIRS $REGREET$REGREET_KONFIG"

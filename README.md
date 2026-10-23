@@ -30,8 +30,8 @@ German.
 
 | | |
 |---|---|
-| Version | 0.1.1 (Tag `anmeldung/0.1.1`; Sitzungshülle, Sitzungsfilter, Vorwahl) |
-| Letzte Prüfung | 20.10.2026: `konfig-pruefen` 75/0, Umschaltung 30/0, Paketprüfung 236/0, Lintian ohne Fehler und Warnungen, Weg G der Prüfliste auf einer Test-VM bestanden (bekannte Grenze: GNOME-Sperre) |
+| Version | 0.1.2 (Tag `anmeldung/0.1.2`; Anmeldebildschirm in der Systemsprache über gettext, Uhr in der Zeitsprache, Info-Zeile mit der Version von Querencia Desktop); seit 0.1.1 Sitzungshülle, Sitzungsfilter, Vorwahl |
+| Letzte Prüfung | 22.10.2026 (0.1.2): `tests/uebersetzung-pruefen.sh`, `tests/konfig-pruefen.sh` mit Info-Zeile, Prüfliste Abschnitt Ü auf einer Test-VM. 20.10.2026 (0.1.1): `konfig-pruefen` 75/0, Umschaltung 30/0, Paketprüfung 236/0, Lintian ohne Fehler und Warnungen, Weg G der Prüfliste auf einer Test-VM bestanden (bekannte Grenze: GNOME-Sperre) |
 | Getestet auf | Ubuntu 26.04, greetd aus dem Archiv, labwc 0.9.8, ReGreet 0.5.0 |
 | Nicht getestet | andere Distributionen, Mehrmonitor, fremde Rechner |
 
@@ -39,12 +39,14 @@ German.
 
 ## Was in diesem Repository liegt
 
-Nur die Querencia-Teile; ReGreet selbst kommt unverändert aus dem
-Upstream-Release 0.5.0 und wird erst beim Paketbau dazugelegt
-(`docs/regreet-herkunft.md`).
+Nur die Querencia-Teile; ReGreet selbst kommt aus dem Upstream-Release
+0.5.0 und wird erst beim Paketbau dazugelegt (`docs/regreet-herkunft.md`).
+Ein einziger, kleiner Patch im Packaging übersetzt seine sichtbaren Texte
+und stellt die Uhr auf die Zeitsprache des Systems (`docs/uebersetzung.md`).
 
 | Ordner | Inhalt | installiert nach |
 |---|---|---|
+| `po/de.po` | deutsche Übersetzung der Texte von ReGreet | `/usr/share/locale/de/LC_MESSAGES/querencia-anmeldung.mo` |
 | `config/greetd/` | greetd- und ReGreet-Konfiguration, labwc-Konfiguration des Anmeldebildschirms | `/etc/querencia/greetd/` |
 | `sbin/querencia-anmeldung` | startet greetd mit dieser Konfiguration | `/usr/sbin/` |
 | `libexec/anmeldung-starten` | Befehl des Anmeldebildschirms: Sitzungsauswahl, Sprache und Tastatur des Systems, dann labwc + ReGreet | `/usr/libexec/querencia-anmeldung/` |
@@ -54,6 +56,7 @@ Upstream-Release 0.5.0 und wird erst beim Paketbau dazugelegt
 | `tmpfiles/` | Zustands- und Protokollordner von ReGreet | `/usr/lib/tmpfiles.d/` |
 | `man/querencia-anmeldung.8` | Handbuchseite | `/usr/share/man/man8/` |
 | `tests/konfig-pruefen.sh` | statische Prüfung (läuft auch beim Paketbau) | – |
+| `tests/uebersetzung-pruefen.sh` | Texte des gepatchten ReGreet gegen `po/de.po` (läuft beim Paketbau) | – |
 | `werkzeuge/paket-bauen.sh` | baut das Debian-Paket nach `build/` | – |
 
 Das Debian-Paket `querencia-anmeldung` (`debian/`, debconf-Umschaltung)

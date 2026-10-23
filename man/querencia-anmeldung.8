@@ -1,4 +1,4 @@
-.TH QUERENCIA-ANMELDUNG 8 "2026-10-20" "querencia-anmeldung 0.1.1" "Querencia Desktop"
+.TH QUERENCIA-ANMELDUNG 8 "2026-10-22" "querencia-anmeldung 0.1.2" "Querencia Desktop"
 .SH NAME
 querencia-anmeldung \- login screen of Querencia Desktop (greetd with ReGreet)
 .SH SYNOPSIS
@@ -17,6 +17,13 @@ in a
 compositor without menu or key bindings. By default it offers only the
 Querencia Desktop sessions; see
 .BR SESSIONS .
+.PP
+The login screen uses the system language and keyboard layout from
+.I /etc/default/locale
+and
+.IR /etc/default/keyboard :
+texts in the language of LANG (German translation included), date and
+time in the time locale (LC_TIME, German "22.10.2026 02:54").
 .PP
 It is not meant to be run by hand; the service
 .B querencia-anmeldung.service
@@ -89,7 +96,13 @@ GDM.
 greetd configuration (virtual terminal 7, user _greetd).
 .TP
 .I /etc/querencia/greetd/regreet.toml
-greeting, background, theme, clock.
+greeting, background, theme, clock (date in the time locale, LC_TIME).
+The greeting gets the Querencia Desktop release from
+.I /usr/share/querencia/release
+or
+.I /usr/share/querencia/version
+when one of them exists; ReGreet then reads a copy in
+.IR /run/querencia-anmeldung/ .
 .TP
 .I /etc/querencia/greetd/sitzungen.conf
 sessions offered next to Querencia Desktop, session wrapper on or off.

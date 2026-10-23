@@ -13,6 +13,15 @@
 | Rust | Edition 2024, `rust-version = "1.85"`; Bau mit rustc 1.93.1 der Distribution |
 | Abhängigkeiten | GTK 4 (≥ 4.16 wegen glycin), glycin 3.0.8 (Bilder; zur Laufzeit `glycin-loaders`), relm4 0.10, greetd_ipc 0.10, zbus 5 |
 
+## Patch
+
+Seit 0.1.2 wendet das Paket einen DEP-3-Patch an
+(`debian/patches/0001-gettext-uhr-nach-lc-time.patch` in
+`querencia-packaging/querencia-anmeldung/`): sichtbare Texte über gettext,
+Sprache der Uhr aus `LC_TIME`. Einzelheiten und Begründung:
+`docs/uebersetzung.md`. Spiegel und Hauptarchiv bleiben der unveränderte
+Tag `0.5.0`.
+
 ## Lizenz
 
 ReGreet ist REUSE-konform:
@@ -26,9 +35,9 @@ ReGreet ist REUSE-konform:
 GPL-3.0-or-later passt zur Lizenz der Querencia-Programme; MIT und 0BSD sind damit verträglich. Die Rust-Abhängigkeiten
 listet `debian/copyright` des Pakets (aus den vendorten `Cargo.toml`).
 
-## Der Bau vom 14.10.2026 (Entwicklungs-VM)
+## Der Bau vom 14.10.2026 (Entwicklungsumgebung)
 
-Der bisherige Anmeldebildschirm der Entwicklungs-VM nutzt
+Der bisherige Anmeldebildschirm der Entwicklungsumgebung nutzt
 `/usr/local/bin/regreet` (11 030 200 Byte, 14.10. 16:26). Gemessen am
 20.10.:
 
@@ -46,5 +55,5 @@ Der bisherige Anmeldebildschirm der Entwicklungs-VM nutzt
   16:26 nach `/usr/local/bin` kopiert (Eigentümer root).
 
 Das Paket nimmt dieselbe Upstream-Version als Quelle (nicht das Binary
-von der Entwicklungs-VM); Unterschiede sind nur die Bauvariablen (eigene Pfade)
+von der Entwicklungsumgebung); Unterschiede sind nur die Bauvariablen (eigene Pfade)
 und die Debian-Bauflags (Härtung, `--remap-path-prefix`).

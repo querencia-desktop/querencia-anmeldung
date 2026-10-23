@@ -1,7 +1,7 @@
 # Prüfliste Anmeldebildschirm (Test-VMs)
 
 Funktionale Prüfung des Pakets `querencia-anmeldung` **nur auf Test-VMs**,
-nie auf der Entwicklungs-VM mit dem laufenden Anmeldebildschirm. Zwei Wege:
+nie in der Entwicklungsumgebung mit dem laufenden Anmeldebildschirm. Zwei Wege:
 
 - **Weg G (GDM):** Ubuntu Desktop 26.04 mit GNOME und GDM, Querencia
   Desktop schon installiert (Koexistenz, z. B. VM 116).
@@ -30,7 +30,7 @@ ist der Dateiname des Belegs. Passwörter nicht in Belege schreiben.
 | G4 | Neustart | GDM erscheint wie vorher, Anmeldung an Ubuntu und an Querencia Desktop wie vorher |
 | G5 | `sudo dpkg-reconfigure querencia-anmeldung` | Frage „Standard-Anmeldedienst“ mit `gdm3` und `querencia-anmeldung`, vorbelegt `gdm3`; `querencia-anmeldung` wählen; Ausgabe „Standard-Anmeldedienst ist jetzt querencia-anmeldung (wirkt nach dem nächsten Neustart)“ |
 | G6 | wie 0.3 | `/usr/sbin/querencia-anmeldung`, `/usr/lib/systemd/system/querencia-anmeldung.service`; GDM läuft noch (nicht angehalten) |
-| G7 | Neustart | **Querencia-Anmeldebildschirm** auf Konsole 7: Grußtext „Querencia Desktop“, Hintergrund Querencia Blau, Thema Querencia-Klassisch, Uhr mit Datum in der Systemsprache; nirgends „Classic2“; Sitzung **„Querencia Desktop“ vorgewählt** (KB3) |
+| G7 | Neustart | **Querencia-Anmeldebildschirm** auf Konsole 7: Grußtext „Querencia Desktop“ (mit Versionsdatei „Querencia Desktop Alpha 2.1“, Ü5), Hintergrund Querencia Blau, Thema Querencia-Klassisch, Beschriftung und Uhr in der Systemsprache (Ü1–Ü4); nirgends „Classic2“; Sitzung **„Querencia Desktop“ vorgewählt** (KB3) |
 | G8 | Sitzungsliste öffnen | **nur** „Querencia Desktop“ (kein „Ubuntu“, kein „labwc“) |
 | G8a | `cat /run/querencia-anmeldung/auswahl.txt; ls /run/querencia-anmeldung/wayland-sessions` | `angeboten …/querencia.desktop querencia`, `ausgeblendet …/ubuntu.desktop nicht-freigegeben`, ggf. `…/labwc.desktop labwc-nie`; im Ordner nur `querencia.desktop` mit `Exec=/usr/libexec/querencia-anmeldung/sitzung-starten /usr/share/wayland-sessions/querencia.desktop` |
 | G8b | Freigabe: `sudo sed -i 's/^freigeben =.*/freigeben = ubuntu labwc/' /etc/querencia/greetd/sitzungen.conf`, Neustart | Liste „Querencia Desktop“ **und** „Ubuntu“, weiter kein „labwc“; `auswahl.txt`: `ubuntu.desktop freigegeben`, `labwc.desktop labwc-nie` |
@@ -41,7 +41,7 @@ ist der Dateiname des Belegs. Passwörter nicht in Belege schreiben.
 | G12 | in GNOME abmelden | Querencia-Anmeldebildschirm erscheint wieder (kein schwarzer Bildschirm), „Ubuntu“ und der Benutzer sind vorbelegt |
 | G12a | Freigabe zurücknehmen: `sudo sed -i 's/^freigeben =.*/freigeben =/' /etc/querencia/greetd/sitzungen.conf`, Neustart | nur „Querencia Desktop“, vorgewählt, obwohl zuletzt „Ubuntu“ gewählt war (`/var/lib/querencia-anmeldung/state.toml`) |
 | G13 | Anmelden mit „Querencia Desktop“ | Panel, Desktop, Hintergrund wie gewohnt; `echo $XDG_CURRENT_DESKTOP $XDG_SESSION_DESKTOP $DESKTOP_SESSION` → `X-Querencia querencia querencia` (wie unter GDM) |
-| G14 | in Querencia abmelden und **sofort** wieder anmelden (unter 10 s) | Sitzung kommt vollständig (QD-062-Gegenprobe unter greetd) |
+| G14 | in Querencia abmelden und **sofort** wieder anmelden (unter 10 s) | Sitzung kommt vollständig (Gegenprobe zum schwarzen Bildschirm nach schneller Neuanmeldung, unter greetd) |
 | G15 | Protokolle: `sudo tail -50 /var/log/querencia-anmeldung/log; journalctl -b -u querencia-anmeldung --no-pager \| tail -30` | keine `ERROR`-Zeilen außer bekannten Hinweisen; Hintergrund geladen (keine glycin-Fehler) |
 | G16 | Knopf „Neu starten“ im Anmeldebildschirm | System startet neu, Querencia-Anmeldebildschirm erscheint wieder |
 | G17 | Zurück zu GDM: `sudo dpkg-reconfigure querencia-anmeldung`, `gdm3` wählen (alternativ `sudo QUERENCIA_ANMELDUNG=nein dpkg-reconfigure querencia-anmeldung`) | wie 0.3: `/usr/sbin/gdm3`, `…/gdm3.service`; die laufende Anmeldung bleibt |
@@ -63,11 +63,28 @@ ist der Dateiname des Belegs. Passwörter nicht in Belege schreiben.
 | S7 | Neustart | Textanmeldung auf tty1 (kein schwarzer Bildschirm, kein greetd mit `agreety`) |
 | S8 | `sudo apt purge -y querencia-anmeldung` | Ordner wie G20 weg |
 
+## Ü Sprache und Info-Zeile (ab 0.1.2, beide Wege)
+
+Systemsprache Deutsch: `/etc/default/locale` mit `LANG=de_DE.UTF-8`, die
+Locale erzeugt (`locale -a` zeigt `de_DE.utf8`). Unter Ubuntu 26.04 ist
+`/etc/default/locale` ein Link auf `/etc/locale.conf`: Sprache nur mit
+`localectl set-locale` ändern, nicht die Datei ersetzen.
+
+| Nr. | Schritt | Erwartung |
+|---|---|---|
+| Ü1 | Anmeldebildschirm ansehen | „Benutzer:“, „Sitzung:“, „Anmelden“, „Neu starten“, „Ausschalten“; Tooltip am Stift-Knopf „Benutzernamen eingeben“ |
+| Ü2 | „Anmelden“ mit gewähltem Benutzer | Feld „Passwort:“, Knöpfe „Abbrechen“ und „Anmelden“ |
+| Ü3 | falsches Passwort | Meldung „Falsches Passwort. Bitte erneut versuchen.“; im Protokoll `Error from greetd: … AUTH_ERR` |
+| Ü4 | Uhr | Datum und Zeit wie im Panel, z. B. „22.10.2026 02:54“ |
+| Ü5 | `printf 'Alpha 2.1\n' \| sudo tee /usr/share/querencia/version` (nur ohne Metapaket ab Alpha 2.1), Anmeldebildschirm neu (`sudo systemctl restart display-manager` von tty1 aus) | Grußtext „Querencia Desktop Alpha 2.1“; ohne Datei nur „Querencia Desktop“ |
+| Ü6 | Gegenprobe Englisch: `sudo localectl set-locale LANG=en_US.UTF-8`, Anmeldebildschirm neu; danach `sudo localectl set-locale LANG=de_DE.UTF-8` | „User:“, „Login“, „Reboot“, „Power Off“, „Wrong password. Please try again.“; Uhr „10/22/2026 02:54“ |
+
 ## Belege und Rückmeldung
 
-- Bildschirmfotos `G7`, `G8`, `G8b`, `G11`, `G11a`, `G12`, `G12a`, `G18`, `S3`; Befehlsausgaben
+- Bildschirmfotos `G7`, `G8`, `G8b`, `G11`, `G11a`, `G12`, `G12a`, `G18`, `S3`, `Ü1`–`Ü6`; Befehlsausgaben
   der übrigen Punkte; `/var/log/querencia-anmeldung/log` und
   `journalctl -b -u querencia-anmeldung` bei jedem FAIL.
-- Bekannte Grenzen: ReGreet ist englisch beschriftet (Upstream ohne
-  Übersetzungen); nur der Grußtext und die Uhr sind Querencia-spezifisch.
+- Seit 0.1.2 übersetzt ein DEP-3-Patch die sichtbaren Texte von ReGreet
+  (`docs/uebersetzung.md`); Texte, die nicht im Katalog stehen (seltene
+  PAM-Meldungen), bleiben englisch.
 - Nach der Prüfung die VM auf den Ausgangssnapshot zurücksetzen.
