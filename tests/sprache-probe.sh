@@ -152,7 +152,6 @@ zeiger 874 391; foto 03-tooltip-sitzung
 klick 839 444; foto 04-abfrage
 zeiger 829 391; foto 05-tooltip-auge
 wtype 1111; sleep 0.5; wtype -k Return; sleep 2; foto 06-falsch
-sleep 3; klick 839 444; wtype 0248; sleep 0.5; wtype -k Return; sleep 2; foto 07-passwort
-klick 720 444; klick 674 391; foto 08-sitzungsliste
+sleep 3; klick 674 391; foto 07-sitzungsliste
 cp "$W/regreet.log" "$AUS/regreet-$kurz.log" 2>/dev/null || true
 echo "fertig $SPRACHE" >>"$LOG"

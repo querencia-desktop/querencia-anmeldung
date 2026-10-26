@@ -49,8 +49,9 @@ Systems (`docs/uebersetzung.md`).
 (`/etc/default/locale`, unter Ubuntu `localectl set-locale`): bei Deutsch
 ist alles deutsch, bei Englisch alles englisch – Beschriftungen, Uhr,
 Sitzungsnamen, Meldungen. Andere Sprachen zeigen englische Beschriftungen.
-GTK-eigene Texte wie der Tooltip am Auge im Passwortfeld kommen aus
-`language-pack-gnome-de-base`; fehlt es, bleiben sie englisch.
+GTK-Dialoge folgen dem Sprachpaket des Systems:
+`language-pack-gnome-<xx>` (deutsch `language-pack-gnome-de`); fehlt es,
+bleiben GTK-eigene Texte wie der Tooltip am Auge im Passwortfeld englisch.
 
 | Ordner | Inhalt | installiert nach |
 |---|---|---|

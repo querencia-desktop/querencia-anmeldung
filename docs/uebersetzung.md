@@ -94,9 +94,13 @@ Warum die Uhr englisch war: ReGreet nimmt die Sprache der Uhr aus
   GTK mit seinem Katalog `gtk40`, unter Ubuntu in
   `language-pack-gnome-de-base`. Fehlt das Paket (Server-Weg: dort kommt
   nur `language-pack-de-base`), bleiben diese Texte englisch – im ganzen
-  Desktop, nicht nur hier. Das Paket kann das nicht sprachneutral
-  abhängen; es gehört zur Spracheinrichtung des Systems
-  (`check-language-support -l de` nennt es).
+  Desktop, nicht nur hier. GTK-Dialoge folgen dem Sprachpaket des
+  Systems (`language-pack-gnome-<xx>`); weder dieses Paket noch das
+  Metapaket hängen davon ab (Entscheidung der Startsession vom
+  26.10.2026: eine feste Abhängigkeit wäre deutschzentriert). Wer per apt
+  installiert, hat die Sprachpakete seines Systems
+  (`check-language-support -l de` nennt sie); das Abbild installiert das
+  Paket der gewählten Sprache.
 - Andere Systemsprachen als Deutsch und Englisch: Beschriftungen englisch
   (kein Katalog), Uhr, Sitzungsnamen und Meldungen von PAM in der
   Systemsprache, soweit es Übersetzungen gibt.
