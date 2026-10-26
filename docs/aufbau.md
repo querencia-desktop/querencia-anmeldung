@@ -6,7 +6,9 @@ systemd
      └─ /usr/sbin/querencia-anmeldung
          └─ greetd --config /etc/querencia/greetd/config.toml
              └─ als _greetd: /usr/libexec/querencia-anmeldung/anmeldung-starten
+                 ├─ Sprache aus /etc/default/locale
                  ├─ sitzungen-auswahl → /run/querencia-anmeldung/wayland-sessions
+                 │   (Sitzungsnamen in der Systemsprache, Name[de] usw.)
                  └─ dbus-run-session -- labwc -C /etc/querencia/greetd/labwc -S regreet
                      └─ /usr/libexec/querencia-anmeldung/regreet (ohne XDG_DATA_DIRS)
                          liest /etc/querencia/greetd/regreet.toml (mit
@@ -124,8 +126,9 @@ labwc dient nur als Wayland-Compositor für ReGreet:
 
 `anmeldung-starten` liest `/etc/default/locale` (`LANG`, `LANGUAGE`,
 `LC_*`) und `/etc/default/keyboard` (`XKBLAYOUT` usw. als
-`XKB_DEFAULT_*`) zeilenweise, damit Uhr und Tastaturbelegung des
-Anmeldebildschirms zum System passen; ein Tippfehler in diesen Dateien
+`XKB_DEFAULT_*`) zeilenweise, damit Texte, Uhr, Sitzungsnamen und
+Tastaturbelegung des Anmeldebildschirms zum System passen (die Sprache
+vor `sitzungen-auswahl`, seit 0.1.3); ein Tippfehler in diesen Dateien
 verhindert die Anmeldung nicht.
 
 ## Abhängigkeiten

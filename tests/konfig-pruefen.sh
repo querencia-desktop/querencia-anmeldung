@@ -44,6 +44,9 @@ pruefe "greetd: Benutzer _greetd" "[ \"\$(wert $C default_session.user)\" = _gre
 pruefe "greetd: Konsole 7" "[ \"\$(wert $C terminal.vt)\" = 7 ]"
 pruefe "greetd: liest die Profile selbst (source_profile nicht abgeschaltet)" "! grep -q source_profile '$C'"
 pruefe "ReGreet: Grußtext Querencia Desktop" "[ \"\$(wert $G appearance.greeting_msg)\" = 'Querencia Desktop' ]"
+pruefe "ReGreet: Auswahl nie übersprungen (skip_selection, sonst englische Meldung)" "[ \"\$(wert $G skip_selection)\" = False ]"
+pruefe "ReGreet: Uhr im Datumsformat der Zeitsprache (%x)" "[ \"\$(wert $G widget.clock.format)\" = '%x %H:%M' ]"
+pruefe "ReGreet: keine feste Sprache der Uhr (locale)" "! grep -q '^[[:space:]]*locale' $G"
 pruefe "ReGreet: Thema Querencia-Klassisch" "[ \"\$(wert $G GTK.theme_name)\" = Querencia-Klassisch ]"
 pruefe "ReGreet: Symbolthema Querencia" "[ \"\$(wert $G GTK.icon_theme_name)\" = Querencia ]"
 pruefe "ReGreet: Hintergrund Querencia Blau" \
@@ -89,7 +92,7 @@ BACKSPACE="guess"
 EOT
 sed -e "s|/etc/default/locale|$TMP/locale|g" -e "s|/etc/default/keyboard|$TMP/keyboard|g" \
     -e 's|^exec .*|env; echo "ARGS $KONFIG $REGREET$REGREET_KONFIG"|' "$D/libexec/anmeldung-starten" >"$TMP/starten"
-printf '#!/bin/sh\necho AUSWAHL-LIEF\n' >"$TMP/auswahl-attrappe"
+printf '#!/bin/sh\necho "AUSWAHL-LIEF LANG=${LANG:-}"\n' >"$TMP/auswahl-attrappe"
 chmod 755 "$TMP/auswahl-attrappe"
 mkdir -p "$TMP/lauf"
 env -i PATH=/usr/bin:/bin XDG_DATA_DIRS=/x QUERENCIA_ANMELDUNG_AUSWAHL="$TMP/auswahl-attrappe" \
@@ -134,7 +137,8 @@ starten_mit "$TMP/fehlt" "$TMP/version-leer" >"$TMP/args"
 pruefe "info: leere Versionsdatei = keine Info-Zeile" \
     "grep -qx 'ARGS $D/config/greetd /usr/libexec/querencia-anmeldung/regreet' '$TMP/args' && [ ! -e '$TMP/lauf/regreet.toml' ]"
 pruefe "starten: XDG_DATA_DIRS entfernt" "! grep -q '^XDG_DATA_DIRS=' '$TMP/env'"
-pruefe "starten: Sitzungsauswahl läuft vorher" "grep -qx AUSWAHL-LIEF '$TMP/env'"
+pruefe "starten: Sitzungsauswahl läuft vorher" "grep -q '^AUSWAHL-LIEF' '$TMP/env'"
+pruefe "starten: Sitzungsauswahl sieht die Systemsprache (Sitzungsnamen)" "grep -qx 'AUSWAHL-LIEF LANG=de_DE.UTF-8' '$TMP/env'"
 pruefe "starten: Standardpfad der Auswahl" \
     "grep -q 'AUSWAHL:-/usr/libexec/querencia-anmeldung/sitzungen-auswahl}' '$D/libexec/anmeldung-starten'"
 pruefe "labwc: setzt kein XDG_DATA_DIRS" "! grep -q XDG_DATA_DIRS '$D/config/greetd/labwc/environment'"
@@ -201,6 +205,18 @@ pruefe "Hülle: ohne Exec abgelehnt" "! pp '$Q/usr/ohne-exec.desktop' >/dev/null
 pruefe "Hülle: fehlendes TryExec abgelehnt" "! pp '$Q/usr/tryexec.desktop' >/dev/null"
 pruefe "Hülle: fehlende Datei abgelehnt" "! pp '$Q/usr/gibt-es-nicht.desktop' >/dev/null"
 pruefe "Hülle: Versteckt erkannt" "pp '$Q/usr/versteckt.desktop' | grep -qx VERSTECKT=ja"
+# übersetzte Sitzungsnamen (Name[de] usw.) nach der Sprache der Umgebung
+printf '[Desktop Entry]\nName=Test session\nName[de]=Testsitzung\nName[de_CH]=Testsitzig\nName[fr]=Session\\sde test\nExec=/bin/true\n' >"$Q/usr/uebersetzt.desktop"
+pn() { env -i PATH=/usr/bin:/bin "$@" sh "$H" --pruefen "$Q/usr/uebersetzt.desktop" 2>&1 | sed -n 's/^NAME=//p'; }
+pruefe "Hülle: Name[de] bei LANG=de_DE.UTF-8" "[ \"\$(pn LANG=de_DE.UTF-8)\" = Testsitzung ]"
+pruefe "Hülle: Name bei LANG=en_US.UTF-8" "[ \"\$(pn LANG=en_US.UTF-8)\" = 'Test session' ]"
+pruefe "Hülle: Name[de_CH] vor Name[de]" "[ \"\$(pn LANG=de_CH.UTF-8)\" = Testsitzig ]"
+pruefe "Hülle: Modifikator, Rückfall auf Name[de]" "[ \"\$(pn LANG=de_AT.UTF-8@euro)\" = Testsitzung ]"
+pruefe "Hülle: C.UTF-8 und ohne Sprache = Name" "[ \"\$(pn LANG=C.UTF-8)\" = 'Test session' ] && [ \"\$(pn)\" = 'Test session' ]"
+pruefe "Hülle: LC_MESSAGES vor LANG" "[ \"\$(pn LANG=de_DE.UTF-8 LC_MESSAGES=en_US.UTF-8)\" = 'Test session' ]"
+pruefe "Hülle: LANGUAGE vor LANG, Escapes" "[ \"\$(pn LANG=en_US.UTF-8 LANGUAGE=fr:de)\" = 'Session de test' ]"
+pruefe "Hülle: Querencia ohne Übersetzung bleibt" "[ \"\$(env -i LANG=de_DE.UTF-8 sh '$H' --pruefen '$Q/usr/querencia.desktop' | sed -n 's/^NAME=//p')\" = 'Querencia Desktop' ]"
+rm -f "$Q/usr/uebersetzt.desktop"
 env -i PATH=/usr/bin:/bin HOME="$TMP/home" XDG_CURRENT_DESKTOP=alt sh "$H" "$Q/usr/test.desktop" >"$TMP/huelle.out" 2>&1
 pruefe "Hülle startet: XDG_CURRENT_DESKTOP" "grep -qx XDG_CURRENT_DESKTOP=ubuntu:GNOME '$TMP/huelle.out'"
 pruefe "Hülle startet: XDG_SESSION_DESKTOP, DESKTOP_SESSION" \
@@ -260,6 +276,12 @@ auswahl
 pruefe "Auswahl: /usr/local/share vor /usr/share" \
     "grep -qx 'Name=Querencia lokal' '$W/querencia.desktop' && grep -q 'ausgeblendet $Q/usr/querencia.desktop verdeckt' '$TMP/lauf/auswahl.txt'"
 rm -f "$Q/lokal/querencia.desktop"
+printf 'freigeben = ubuntu\nhuelle = ja\n' >"$TMP/konfig/sitzungen.conf"
+sed -i 's/^Name=Ubuntu$/Name=Ubuntu\nName[de]=Ubuntu deutsch/' "$Q/usr/ubuntu.desktop"
+LANG=de_DE.UTF-8 LANGUAGE= LC_ALL= LC_MESSAGES= auswahl
+pruefe "Auswahl de: Sitzungsname Name[de]" "grep -qx 'Name=Ubuntu deutsch' '$W/ubuntu.desktop'"
+LANG=en_US.UTF-8 LANGUAGE= LC_ALL= LC_MESSAGES= auswahl
+pruefe "Auswahl en: Sitzungsname Name" "grep -qx 'Name=Ubuntu' '$W/ubuntu.desktop'"
 HUELLE_TEST=$TMP/gibt-es-nicht
 auswahl
 pruefe "Auswahl ohne Hülle: keine Sitzung" "[ -z \"\$(ls '$W')\" ] && grep -q 'keine-huelle' '$TMP/lauf/auswahl.txt'"

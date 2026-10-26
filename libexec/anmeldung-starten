@@ -21,10 +21,6 @@ KONFIG=${QUERENCIA_ANMELDUNG_KONFIG:-/etc/querencia/greetd}
 REGREET=${QUERENCIA_ANMELDUNG_REGREET:-/usr/libexec/querencia-anmeldung/regreet}
 AUSWAHL=${QUERENCIA_ANMELDUNG_AUSWAHL:-/usr/libexec/querencia-anmeldung/sitzungen-auswahl}
 
-# Meldungen ins Journal des Dienstes (stderr von greetd); ein Fehler hier
-# lässt ReGreet mit der leeren oder vorigen Liste starten.
-"$AUSWAHL" >&2 || echo "anmeldung-starten: keine Sitzung angeboten (siehe sitzungen-auswahl)" >&2
-
 # wert <zeile>: Wert hinter dem ersten "=", ohne umschließende Anführungszeichen
 wert() {
     v=${1#*=}
@@ -45,6 +41,12 @@ if [ -r /etc/default/locale ]; then
         esac
     done </etc/default/locale
 fi
+
+# Sitzungsliste erst nach der Sprache: sitzungen-auswahl übernimmt die
+# Sitzungsnamen in der Systemsprache (Name[de] usw. der Sitzungsdateien).
+# Meldungen ins Journal des Dienstes (stderr von greetd); ein Fehler hier
+# lässt ReGreet mit der leeren oder vorigen Liste starten.
+"$AUSWAHL" >&2 || echo "anmeldung-starten: keine Sitzung angeboten (siehe sitzungen-auswahl)" >&2
 
 if [ -r /etc/default/keyboard ]; then
     while IFS= read -r zeile || [ -n "$zeile" ]; do

@@ -19,8 +19,9 @@
 # weil gnome-session sich in einer Anmelde-Shell neu startet – so auch
 # unter GDM, das selbst keine Profile liest.
 #
-# --pruefen gibt Schlüssel=Wert-Zeilen aus (NAME, VERSTECKT, DESKTOPNAMES,
-# die vier Variablen, EXEC) und startet nichts; sitzungen-auswahl nutzt
+# --pruefen gibt Schlüssel=Wert-Zeilen aus (NAME, übersetzt nach Name[de]
+# usw. in der Sprache der Umgebung, VERSTECKT, DESKTOPNAMES, die vier
+# Variablen, EXEC) und startet nichts; sitzungen-auswahl nutzt
 # das, um nur Dateien anzubieten, die die Hülle starten kann.
 # Exit 1: Datei fehlt oder ist unlesbar, keine Gruppe [Desktop Entry],
 # Type nicht Application, Exec fehlt, TryExec nicht vorhanden.
@@ -50,9 +51,26 @@ entschluesseln() {
         -e 's/\\t/\t/g' -e 's/\\r//g' -e 's/\x01/\\/g'
 }
 
+# Sprachen für Name[...] wie GLib (g_get_language_names): LANGUAGE (mit ":"
+# getrennt), sonst LC_ALL, LC_MESSAGES, LANG; je Sprache die Schlüssel der
+# Desktop-Entry-Spezifikation in dieser Reihenfolge: sprache_LAND@MOD,
+# sprache_LAND, sprache@MOD, sprache. "C" und "POSIX" haben keine.
+SPRACHEN=
+for s in $(printf '%s' "${LANGUAGE:-}" | tr ':' ' ') ${LC_ALL:-${LC_MESSAGES:-${LANG:-}}}; do
+    mod=
+    case $s in *@*) mod=@${s#*@}; s=${s%%@*} ;; esac
+    s=${s%%.*}
+    case $s$mod in '' | C | POSIX | C@* | POSIX@* | *[!A-Za-z0-9_@-]*) continue ;; esac
+    spr=${s%%_*}
+    for k in "$s$mod" "$s" "$spr$mod" "$spr"; do
+        case " $SPRACHEN " in *" $k "*) ;; *) SPRACHEN="$SPRACHEN $k" ;; esac
+    done
+done
+
 GRUPPE=
 GEFUNDEN=
 NAME= EXEC= TRYEXEC= DNAMES= TYP= VERSTECKT=nein
+NAMEN_UEBERSETZT=
 while IFS= read -r zeile || [ -n "$zeile" ]; do
     case $zeile in
     '' | '#'*) continue ;;
@@ -70,6 +88,8 @@ while IFS= read -r zeile || [ -n "$zeile" ]; do
     wert=$(printf '%s' "$wert" | sed 's/^[[:space:]]*//')
     case $schluessel in
     Name) [ -n "$NAME" ] || NAME=$(entschluesseln "$wert") ;;
+    Name\[*\]) NAMEN_UEBERSETZT="$NAMEN_UEBERSETZT
+${schluessel#Name}=$wert" ;;
     Exec) [ -n "$EXEC" ] || EXEC=$(entschluesseln "$wert") ;;
     TryExec) [ -n "$TRYEXEC" ] || TRYEXEC=$(entschluesseln "$wert") ;;
     DesktopNames) [ -n "$DNAMES" ] || DNAMES=$(entschluesseln "$wert") ;;
@@ -88,6 +108,12 @@ if [ -n "$TRYEXEC" ]; then
     esac
 fi
 [ -n "$NAME" ] || NAME=$STAMM
+# übersetzter Name (Name[de] usw.) der ersten passenden Sprache
+for k in $SPRACHEN; do
+    z=$(printf '%s\n' "$NAMEN_UEBERSETZT" | grep -m 1 "^\[$k\]=") || continue
+    z=$(entschluesseln "${z#*=}")
+    [ -n "$z" ] && { NAME=$z; break; }
+done
 
 # "ubuntu;GNOME;" -> "ubuntu:GNOME"
 DESKTOP=$(printf '%s' "$DNAMES" | sed -e 's/;*$//' -e 's/;/:/g')

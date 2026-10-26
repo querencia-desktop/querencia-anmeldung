@@ -4,12 +4,15 @@
 # Die englischen Quelltexte stehen in ReGreet 0.5.0 und im Patch
 # debian/patches/0001-gettext-uhr-nach-lc-time.patch des Pakets
 # querencia-anmeldung (Aufrufe tr("...")); tests/uebersetzung-pruefen.sh
-# gleicht beide ab. Die Eingabeaufforderungen von PAM kommen aus greetd
-# ohne Spracheinstellung immer englisch und werden hier mit übersetzt.
+# gleicht beide ab. Die Texte von PAM kommen aus greetd ohne
+# Spracheinstellung immer englisch; ReGreet übersetzt sie zuerst mit diesem
+# Katalog, dann mit dem von Linux-PAM (language-pack-de-base). Hier stehen
+# die Eingabeaufforderungen, deren Wortlaut im Anmeldebildschirm kürzer
+# sein soll als der von Linux-PAM.
 msgid ""
 msgstr ""
-"Project-Id-Version: querencia-anmeldung 0.1.2\n"
-"PO-Revision-Date: 2026-10-22 03:30+0200\n"
+"Project-Id-Version: querencia-anmeldung 0.1.3\n"
+"PO-Revision-Date: 2026-10-26 23:30+0100\n"
 "Last-Translator: pottrauschen\n"
 "Language-Team: Deutsch\n"
 "Language: de\n"
@@ -72,3 +75,7 @@ msgstr "Neues Passwort:"
 
 msgid "Retype new password:"
 msgstr "Neues Passwort wiederholen:"
+
+# Demo-Modus von ReGreet (--demo, Sprachprobe tests/sprache-probe.sh)
+msgid "One-Time Password:"
+msgstr "Einmalpasswort:"

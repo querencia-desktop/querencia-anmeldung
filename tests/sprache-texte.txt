@@ -1,0 +1,33 @@
+# Erwartete Texte des Anmeldebildschirms: Englisch (Quelltext, bei en_US)
+# und Deutsch (bei de_DE). Geprüft von tests/uebersetzung-pruefen.sh;
+# dieselbe Liste gilt für die Fotos der Sprachprobe (tests/sprache-probe.sh)
+# und für Abschnitt Ü der Prüfliste.
+#
+# Spalten mit "|" getrennt: Quelle | Englisch | Deutsch
+#   katalog    po/de.po dieses Pakets (Pflicht, sonst FAIL)
+#   linux-pam  Katalog Linux-PAM.mo des Systems (language-pack-de-base);
+#              fehlt er auf dem Prüfrechner: SKIP
+#   gtk        Katalog gtk40.mo des Systems (language-pack-gnome-de-base);
+#              fehlt er: SKIP (dann bleiben diese Texte englisch)
+katalog|User:|Benutzer:
+katalog|Session:|Sitzung:
+katalog|Login|Anmelden
+katalog|Cancel|Abbrechen
+katalog|Reboot|Neu starten
+katalog|Power Off|Ausschalten
+katalog|Manually enter username|Benutzernamen eingeben
+katalog|Manually enter session command|Sitzungsbefehl eingeben
+katalog|Password:|Passwort:
+katalog|Wrong password. Please try again.|Falsches Passwort. Bitte erneut versuchen.
+katalog|Login failed:|Anmeldung fehlgeschlagen:
+katalog|Current password:|Aktuelles Passwort:
+katalog|New password:|Neues Passwort:
+katalog|Retype new password:|Neues Passwort wiederholen:
+katalog|One-Time Password:|Einmalpasswort:
+linux-pam|You are required to change your password immediately (administrator enforced).|Sie müssen Ihr Passwort sofort ändern (von root erzwungen).
+linux-pam|You are required to change your password immediately (password expired).|Sie müssen Ihr Passwort sofort ändern (Passwortablauf).
+linux-pam|Your account has expired; please contact your system administrator.|Ihr Konto ist abgelaufen. Wenden Sie sich an den Systemadministrator.
+linux-pam|Sorry, passwords do not match.|Die Passwörter stimmen nicht überein.
+gtk|Show Text|Text anzeigen
+gtk|Hide Text|Text verbergen
+gtk|Caps Lock is on|Feststelltaste ist aktiviert

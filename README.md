@@ -30,8 +30,8 @@ German.
 
 | | |
 |---|---|
-| Version | 0.1.2 (Tag `anmeldung/0.1.2`; Anmeldebildschirm in der Systemsprache über gettext, Uhr in der Zeitsprache, Info-Zeile mit der Version von Querencia Desktop); seit 0.1.1 Sitzungshülle, Sitzungsfilter, Vorwahl |
-| Letzte Prüfung | 22.10.2026 (0.1.2): `tests/uebersetzung-pruefen.sh`, `tests/konfig-pruefen.sh` mit Info-Zeile, Prüfliste Abschnitt Ü auf einer Test-VM. 20.10.2026 (0.1.1): `konfig-pruefen` 75/0, Umschaltung 30/0, Paketprüfung 236/0, Lintian ohne Fehler und Warnungen, Weg G der Prüfliste auf einer Test-VM bestanden (bekannte Grenze: GNOME-Sperre) |
+| Version | 0.1.3 (Anmeldebildschirm durchgehend in der Systemsprache Deutsch oder Englisch, auch Sitzungsnamen und Meldungen von PAM); seit 0.1.2 Übersetzung über gettext, Uhr in der Zeitsprache, Info-Zeile; seit 0.1.1 Sitzungshülle, Sitzungsfilter, Vorwahl |
+| Letzte Prüfung | 26.10.2026 (0.1.3): `tests/konfig-pruefen.sh`, `tests/uebersetzung-pruefen.sh`, isolierte Sprachprobe `tests/sprache-probe.sh` (de und en). 22.10.2026 (0.1.2): `tests/uebersetzung-pruefen.sh`, `tests/konfig-pruefen.sh` mit Info-Zeile, Prüfliste Abschnitt Ü auf einer Test-VM. 20.10.2026 (0.1.1): `konfig-pruefen` 75/0, Umschaltung 30/0, Paketprüfung 236/0, Lintian ohne Fehler und Warnungen, Weg G der Prüfliste auf einer Test-VM bestanden (bekannte Grenze: GNOME-Sperre) |
 | Getestet auf | Ubuntu 26.04, greetd aus dem Archiv, labwc 0.9.8, ReGreet 0.5.0 |
 | Nicht getestet | andere Distributionen, Mehrmonitor, fremde Rechner |
 
@@ -42,7 +42,15 @@ German.
 Nur die Querencia-Teile; ReGreet selbst kommt aus dem Upstream-Release
 0.5.0 und wird erst beim Paketbau dazugelegt (`docs/regreet-herkunft.md`).
 Ein einziger, kleiner Patch im Packaging übersetzt seine sichtbaren Texte
-und stellt die Uhr auf die Zeitsprache des Systems (`docs/uebersetzung.md`).
+und die Meldungen von PAM und stellt die Uhr auf die Zeitsprache des
+Systems (`docs/uebersetzung.md`).
+
+**Sprache:** Der Anmeldebildschirm folgt der Systemsprache
+(`/etc/default/locale`, unter Ubuntu `localectl set-locale`): bei Deutsch
+ist alles deutsch, bei Englisch alles englisch – Beschriftungen, Uhr,
+Sitzungsnamen, Meldungen. Andere Sprachen zeigen englische Beschriftungen.
+GTK-eigene Texte wie der Tooltip am Auge im Passwortfeld kommen aus
+`language-pack-gnome-de-base`; fehlt es, bleiben sie englisch.
 
 | Ordner | Inhalt | installiert nach |
 |---|---|---|
@@ -56,7 +64,8 @@ und stellt die Uhr auf die Zeitsprache des Systems (`docs/uebersetzung.md`).
 | `tmpfiles/` | Zustands- und Protokollordner von ReGreet | `/usr/lib/tmpfiles.d/` |
 | `man/querencia-anmeldung.8` | Handbuchseite | `/usr/share/man/man8/` |
 | `tests/konfig-pruefen.sh` | statische Prüfung (läuft auch beim Paketbau) | – |
-| `tests/uebersetzung-pruefen.sh` | Texte des gepatchten ReGreet gegen `po/de.po` (läuft beim Paketbau) | – |
+| `tests/uebersetzung-pruefen.sh` | Texte des gepatchten ReGreet gegen `po/de.po`, keine englischen Reste, erwartete Texte aus `tests/sprache-texte.txt` (läuft beim Paketbau) | – |
+| `tests/sprache-probe.sh` | isolierte Sprachprobe: Fotos des gebauten Anmeldebildschirms in einer Sprache, ohne Systemänderung | – |
 | `werkzeuge/paket-bauen.sh` | baut das Debian-Paket nach `build/` | – |
 
 Das Debian-Paket `querencia-anmeldung` (`debian/`, debconf-Umschaltung)
@@ -121,8 +130,8 @@ GPL-3.0-or-later, siehe [LICENSE](LICENSE) (reiner Lizenztext). Copyright 2026
 Querencia Desktop contributors; Urheber- und Fremdhinweise in
 [COPYRIGHT](COPYRIGHT).
 
-ReGreet 0.5.0 liegt nicht in diesem Repository; das Paket baut es unverändert
-aus der Upstream-Quelle. ReGreet steht unter GPL-3.0-or-later (einzelne
+ReGreet 0.5.0 liegt nicht in diesem Repository; das Paket baut es aus der
+Upstream-Quelle mit dem einen Übersetzungs-Patch. ReGreet steht unter GPL-3.0-or-later (einzelne
 Dateien zusätzlich MIT bzw. 0BSD, siehe
 [docs/regreet-herkunft.md](docs/regreet-herkunft.md)); wegen der Crate
 `greetd_ipc` (GPL-3.0-only) ist das gebaute ReGreet-Programm als Ganzes
