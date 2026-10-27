@@ -5,6 +5,10 @@
 #   sh tests/uebersetzung-pruefen.sh <regreet-quellbaum> [<po-datei>]
 # Jeder Text in tr("...") und in den Variablen, die an tr(...) gehen, muss
 # in der po-Datei stehen und übersetzt sein; msgfmt -c muss sie annehmen.
+# Dazu: keine sichtbaren Texte ohne tr(...) (keine englischen Reste bei
+# Deutsch), Texte von PAM über tr_pam(...), und die erwarteten Texte aus
+# tests/sprache-texte.txt (eigener Katalog Pflicht, Linux-PAM und GTK nur,
+# wenn deren Kataloge auf dem Prüfrechner liegen).
 # Exit 0 = alles PASS.
 set -u
 Q=${1:?Quellbaum von ReGreet fehlt}
@@ -41,6 +45,40 @@ for text in open(sys.argv[2], encoding="utf-8").read().splitlines():
         print(f"FAIL fehlt in der po-Datei: {text}")
         sys.exit(1)
 EOF
+
+# Keine englischen Reste bei Deutsch: sichtbare Texte nur über tr(...),
+# Texte von PAM nur über tr_pam(...) (eigener Katalog, dann Linux-PAM).
+T=$Q/src/gui/templates.rs
+M=$Q/src/gui/model.rs
+if grep -nE '(set_label|set_text|set_title|set_placeholder_text|set_tooltip_text)[: (]+(Some\()?"' "$T" >"$TMP/reste"; then
+    nein "Text ohne tr(...) in templates.rs: $(tr '\n' ' ' <"$TMP/reste")"
+else
+    ok "templates.rs: alle Beschriftungen über tr(...)"
+fi
+# Anzeigetext von display_error/display_info (zweites Argument) nie ein
+# englisches Literal; Ausnahme "Auto-selecting session" (einzeiliger Aufruf)
+# gibt es nur mit skip_selection = true (Querencia: false, konfig-pruefen).
+awk '/self\.display_(error|info)\($/ { n = NR + 2 } NR == n && /^[[:space:]]*(&?format!\(|")/ { print NR ": " $0 }' "$M" >"$TMP/reste"
+if [ -s "$TMP/reste" ]; then
+    nein "Anzeigetext ohne tr in model.rs: $(tr '\n' ' ' <"$TMP/reste")"
+else
+    ok "model.rs: Anzeigetexte über tr(...)"
+fi
+if grep -q 'fn tr_pam' "$Q/src/gui/mod.rs"; then
+    n=$(grep -c 'tr_pam(&auth_message)' "$M")
+    if [ "$n" -eq 4 ]; then ok "model.rs: Texte von PAM über tr_pam (4 Stellen)"; else nein "model.rs: tr_pam(&auth_message) an $n statt 4 Stellen"; fi
+    if grep -q 'capitalize(&auth_message)' "$M"; then nein "model.rs: PAM-Meldung ohne Übersetzung"; fi
+    if grep -q 'dgettext(Some("Linux-PAM")' "$Q/src/gui/mod.rs"; then
+        ok "mod.rs: Rückfall auf den Katalog Linux-PAM"
+    else
+        nein "mod.rs: kein Rückfall auf Linux-PAM"
+    fi
+else
+    nein "mod.rs: tr_pam fehlt (Patch vor 0.1.3?)"
+fi
+
+# Erwartete Texte (tests/sprache-texte.txt)
+python3 -I "$(dirname "$0")/sprache-texte-pruefen.py" "$PO" "$(dirname "$0")/sprache-texte.txt" || fehler=1
 
 [ $fehler = 0 ] && echo "ERGEBNIS: PASS" || echo "ERGEBNIS: FAIL"
 exit $fehler

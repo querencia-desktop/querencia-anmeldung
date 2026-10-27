@@ -1,5 +1,29 @@
 # Änderungen
 
+## 0.1.3 – 26.10.2026
+
+- Durchgehend zweisprachig: bei Deutsch alles deutsch, bei Englisch alles
+  englisch, keine Mischung (QD-179).
+- Sitzungsnamen in der Systemsprache: `sitzung-starten --pruefen` nimmt
+  `Name[de]` usw. wie GLib (`LANGUAGE`, `LC_ALL`, `LC_MESSAGES`, `LANG`),
+  `anmeldung-starten` setzt die Systemsprache vor `sitzungen-auswahl`.
+  Vorher blieben übersetzte Sitzungen englisch („Test session“ statt
+  „Testsitzung“).
+- Meldungen von PAM übersetzt (Patch erweitert, `tr_pam`): erst
+  `po/de.po`, dann der Katalog `Linux-PAM` des Systems, z. B. „Sie müssen
+  Ihr Passwort sofort ändern (von root erzwungen).“ statt der englischen
+  Zeile. greetd setzt keine Sprache, deshalb kamen sie bisher englisch.
+- `po/de.po`: „One-Time Password:“ (Demo-Modus, Sprachprobe).
+- Prüfungen: `tests/uebersetzung-pruefen.sh` meldet sichtbare Texte ohne
+  Übersetzung (keine englischen Reste bei Deutsch) und prüft die Liste der
+  erwarteten Texte `tests/sprache-texte.txt`; neue isolierte Sprachprobe
+  `tests/sprache-probe.sh` (Fotos de und en, ohne Systemänderung);
+  `tests/konfig-pruefen.sh` um Sitzungsnamen, Reihenfolge Sprache vor
+  Auswahl, `skip_selection` und Uhrformat erweitert. Prüfliste Ü7–Ü9.
+- Grenze, dokumentiert: GTK-eigene Texte (Tooltip am Auge, Hinweis
+  Feststelltaste, Kontextmenü) brauchen `language-pack-gnome-de-base`;
+  ohne bleiben sie englisch.
+
 ## 0.1.2 – 22.10.2026
 
 - Anmeldebildschirm in der Systemsprache: Beschriftungen,

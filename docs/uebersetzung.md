@@ -1,7 +1,19 @@
 # Übersetzung des Anmeldebildschirms
 
 Seit 0.1.2 zeigt der Anmeldebildschirm seine Texte in der Systemsprache.
-Mitgeliefert ist Deutsch, Quelltext ist Englisch.
+Mitgeliefert ist Deutsch, Quelltext ist Englisch. Seit 0.1.3 durchgehend:
+bei `de_DE` alles deutsch, bei `en_US` alles englisch, auch Sitzungsnamen
+und Meldungen von PAM (`tests/sprache-texte.txt` listet die erwarteten
+Texte beider Sprachen).
+
+| Text | Quelle | Deutsch kommt aus |
+|---|---|---|
+| Beschriftungen, Knöpfe, Tooltips, eigene Fehlermeldungen | ReGreet (Patch, `tr`) | `po/de.po` |
+| Uhr | ReGreet (Patch, Uhr nach `LC_TIME`) | Zeitsprache des Systems |
+| Eingabeaufforderungen und Meldungen von PAM | greetd (ohne Sprache) | `po/de.po`, sonst Katalog `Linux-PAM` (`language-pack-de-base`) |
+| Sitzungsnamen | `Name[de]` usw. der Sitzungsdatei | `sitzung-starten`, `sitzungen-auswahl` |
+| Tooltip am Auge, Hinweis Feststelltaste, Kontextmenü der Eingabefelder | GTK selbst | Katalog `gtk40` (`language-pack-gnome-de-base`) |
+| Grußtext „Querencia Desktop Alpha …“, Benutzername | Name und Ausgabe, Konto | in beiden Sprachen gleich |
 
 ## Der Patch an ReGreet
 
@@ -13,9 +25,9 @@ Quelltext. Das Paket wendet deshalb einen einzigen DEP-3-Patch an:
 
 | Datei in ReGreet | Änderung |
 |---|---|
-| `src/gui/mod.rs` | `tr(msgid)` = `glib::dgettext(Some("querencia-anmeldung"), msgid)` |
+| `src/gui/mod.rs` | `tr(msgid)` = `glib::dgettext(Some("querencia-anmeldung"), msgid)`; `tr_pam(msgid)` für Texte von PAM: erst `tr`, dann `dgettext(Some("Linux-PAM"), msgid)` (seit 0.1.3) |
 | `src/gui/templates.rs` | Beschriftungen, Knöpfe und Tooltips über `tr` |
-| `src/gui/model.rs` | Eingabeaufforderungen von PAM und Fehlermeldungen über `tr`; abgelehntes Passwort (`AUTH_ERR`) als „Wrong password. Please try again.“ statt „Login failed: Pam_authenticate: AUTH_ERR“ |
+| `src/gui/model.rs` | Eingabeaufforderungen, Info- und Fehlermeldungen von PAM über `tr_pam` (Meldungen seit 0.1.3), eigene Fehlermeldungen über `tr`; abgelehntes Passwort (`AUTH_ERR`) als „Wrong password. Please try again.“ statt „Login failed: Pam_authenticate: AUTH_ERR“ |
 | `src/gui/widget/clock.rs` | Sprache der Uhr aus `LC_ALL`, `LC_TIME`, `LANG` |
 
 glib kommt mit gtk4 und relm4: keine neue Crate, `Cargo.lock` bleibt
@@ -38,6 +50,18 @@ Warum die Uhr englisch war: ReGreet nimmt die Sprache der Uhr aus
   `po/de.po` übersetzt ist; läuft beim Paketbau nach dem Patch.
   `debian/rules` prüft außerdem, dass ein Text des Patches im Binary
   steht.
+- Seit 0.1.3 prüft `tests/uebersetzung-pruefen.sh` außerdem, dass keine
+  sichtbaren Texte ohne `tr` im Quellbaum stehen (Beschriftungen in
+  `templates.rs`, Anzeigetexte in `model.rs`), dass alle Texte von PAM
+  über `tr_pam` gehen und dass die erwarteten Texte aus
+  `tests/sprache-texte.txt` stimmen (eigener Katalog genau; Linux-PAM und
+  GTK nur, wenn deren Kataloge und die Locale `de_DE` auf dem Prüfrechner
+  liegen, sonst SKIP).
+- `tests/sprache-probe.sh` fotografiert den Anmeldebildschirm isoliert:
+  das gebaute ReGreet im Demo-Modus in einem kopflosen labwc, in einem
+  eigenen Benutzer- und Mount-Namensraum (Katalog, Sitzungen und ein
+  Schein-Benutzer nur dort sichtbar, nichts am System geändert). Mit
+  `ohne-gtk-katalog` wie ein System ohne `language-pack-gnome-de-base`.
 - Neue Texte im Patch: in `po/de.po` eintragen, sonst scheitert der Bau.
 
 ## Sprache, Uhr, Info-Zeile
@@ -48,8 +72,38 @@ Warum die Uhr englisch war: ReGreet nimmt die Sprache der Uhr aus
 - Uhr: `format = "%x %H:%M"` in `regreet.toml`; `%x` ist das Datum der
   Zeitsprache, deutsch „22.10.2026 02:54“ wie im Panel, englisch (USA)
   „10/22/2026 02:54“.
-- PAM: greetd setzt keine Sprache, deshalb kommen die Aufforderungen von
-  `pam_unix` englisch („Password:“); `po/de.po` übersetzt die üblichen.
+- PAM: greetd ruft kein `setlocale` auf, deshalb kommen Aufforderungen und
+  Meldungen von `pam_unix` immer englisch („Password:“ oder die Meldung,
+  dass das Passwort sofort zu ändern ist). ReGreet übersetzt sie mit
+  `tr_pam`: erst `po/de.po` (kurze Aufforderungen wie „Neues Passwort:“),
+  dann der Katalog `Linux-PAM` des Systems (unter Ubuntu in
+  `language-pack-de-base`, das jedes deutsche System hat). Meldungen mit
+  Zahlen („… in 3 days“) bleiben englisch, ebenso der technische Teil von
+  „Anmeldung fehlgeschlagen: Pam_acct_mgmt: …“ (Fehlercode von greetd).
+- Sitzungsnamen (seit 0.1.3): `sitzung-starten --pruefen` nimmt `Name[…]`
+  in der Sprache der Umgebung wie GLib (`LANGUAGE`, sonst `LC_ALL`,
+  `LC_MESSAGES`, `LANG`; je Sprache `de_DE@mod`, `de_DE`, `de@mod`, `de`),
+  sonst `Name`. `anmeldung-starten` setzt die Systemsprache **vor**
+  `sitzungen-auswahl`, das den Namen in die erzeugte Sitzungsdatei
+  schreibt (ReGreet liest nur `Name`). „Querencia Desktop“ ist ein Name und
+  hat keine Übersetzung. Wechselt die Systemsprache, heißt eine übersetzte
+  Sitzung anders; ihre gemerkte Wahl in `state.toml` gilt dann nicht mehr,
+  und die Vorwahl nimmt „Querencia Desktop“.
+- GTK-eigene Texte (Tooltip „Text anzeigen“ am Auge, Hinweis
+  „Feststelltaste ist aktiviert“, Kontextmenü „Ausschneiden“ …) übersetzt
+  GTK mit seinem Katalog `gtk40`, unter Ubuntu in
+  `language-pack-gnome-de-base`. Fehlt das Paket (Server-Weg: dort kommt
+  nur `language-pack-de-base`), bleiben diese Texte englisch – im ganzen
+  Desktop, nicht nur hier. GTK-Dialoge folgen dem Sprachpaket des
+  Systems (`language-pack-gnome-<xx>`); weder dieses Paket noch das
+  Metapaket hängen davon ab (Entscheidung der Startsession vom
+  26.10.2026: eine feste Abhängigkeit wäre deutschzentriert). Wer per apt
+  installiert, hat die Sprachpakete seines Systems
+  (`check-language-support -l de` nennt sie); das Abbild installiert das
+  Paket der gewählten Sprache.
+- Andere Systemsprachen als Deutsch und Englisch: Beschriftungen englisch
+  (kein Katalog), Uhr, Sitzungsnamen und Meldungen von PAM in der
+  Systemsprache, soweit es Übersetzungen gibt.
 - Info-Zeile: `anmeldung-starten` hängt die Ausgabe aus
   `/usr/share/querencia/release` (`VERSION`) bzw. der ersten Zeile von
   `/usr/share/querencia/version` an den Grußtext („Querencia Desktop Alpha

@@ -1,4 +1,4 @@
-.TH QUERENCIA-ANMELDUNG 8 "2026-10-22" "querencia-anmeldung 0.1.2" "Querencia Desktop"
+.TH QUERENCIA-ANMELDUNG 8 "2026-10-26" "querencia-anmeldung 0.1.3" "Querencia Desktop"
 .SH NAME
 querencia-anmeldung \- login screen of Querencia Desktop (greetd with ReGreet)
 .SH SYNOPSIS
@@ -22,8 +22,13 @@ The login screen uses the system language and keyboard layout from
 .I /etc/default/locale
 and
 .IR /etc/default/keyboard :
-texts in the language of LANG (German translation included), date and
-time in the time locale (LC_TIME, German "22.10.2026 02:54").
+texts in the language of LANG (German translation included; English is
+the source language), date and time in the time locale (LC_TIME, German
+"22.10.2026 02:54"), session names from Name[de] and so on of the session
+files, and messages from PAM through the Linux-PAM catalog. GTK's own
+texts (tooltip of the eye button, Caps Lock warning, context menu) need the
+GTK translation of the system language (on Ubuntu
+.BR language-pack-gnome-de-base ).
 .PP
 It is not meant to be run by hand; the service
 .B querencia-anmeldung.service

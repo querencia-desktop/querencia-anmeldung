@@ -63,7 +63,7 @@ ist der Dateiname des Belegs. Passwörter nicht in Belege schreiben.
 | S7 | Neustart | Textanmeldung auf tty1 (kein schwarzer Bildschirm, kein greetd mit `agreety`) |
 | S8 | `sudo apt purge -y querencia-anmeldung` | Ordner wie G20 weg |
 
-## Ü Sprache und Info-Zeile (ab 0.1.2, beide Wege)
+## Ü Sprache und Info-Zeile (ab 0.1.2, Ü7–Ü9 ab 0.1.3, beide Wege)
 
 Systemsprache Deutsch: `/etc/default/locale` mit `LANG=de_DE.UTF-8`, die
 Locale erzeugt (`locale -a` zeigt `de_DE.utf8`). Unter Ubuntu 26.04 ist
@@ -77,14 +77,19 @@ Locale erzeugt (`locale -a` zeigt `de_DE.utf8`). Unter Ubuntu 26.04 ist
 | Ü3 | falsches Passwort | Meldung „Falsches Passwort. Bitte erneut versuchen.“; im Protokoll `Error from greetd: … AUTH_ERR` |
 | Ü4 | Uhr | Datum und Zeit wie im Panel, z. B. „22.10.2026 02:54“ |
 | Ü5 | `printf 'Alpha 2.1\n' \| sudo tee /usr/share/querencia/version` (nur ohne Metapaket ab Alpha 2.1), Anmeldebildschirm neu (`sudo systemctl restart display-manager` von tty1 aus) | Grußtext „Querencia Desktop Alpha 2.1“; ohne Datei nur „Querencia Desktop“ |
-| Ü6 | Gegenprobe Englisch: `sudo localectl set-locale LANG=en_US.UTF-8`, Anmeldebildschirm neu; danach `sudo localectl set-locale LANG=de_DE.UTF-8` | „User:“, „Login“, „Reboot“, „Power Off“, „Wrong password. Please try again.“; Uhr „10/22/2026 02:54“ |
+| Ü6 | Gegenprobe Englisch: `sudo localectl set-locale LANG=en_US.UTF-8`, Anmeldebildschirm neu; danach `sudo localectl set-locale LANG=de_DE.UTF-8` | „User:“, „Login“, „Reboot“, „Power Off“, „Wrong password. Please try again.“; Uhr „10/22/2026 02:54“; Sitzung aus Ü7 „Test session“, Meldung aus Ü8 englisch; nirgends ein deutscher Text |
+| Ü7 | Sitzungsname (ab 0.1.3): `printf '[Desktop Entry]\nName=Test session\nName[de]=Testsitzung\nExec=/bin/false\nType=Application\n' \| sudo tee /usr/local/share/wayland-sessions/probe.desktop`, `freigeben = probe` in `sitzungen.conf`, Anmeldebildschirm neu; danach Datei löschen, Freigabe zurücknehmen | Sitzungsliste „Querencia Desktop“ und „Testsitzung“; `auswahl.txt`: `probe.desktop freigegeben` |
+| Ü8 | Meldung von PAM (ab 0.1.3): `sudo passwd -e probe`, anmelden mit dem alten Passwort | „Sie müssen Ihr Passwort sofort ändern (von root erzwungen).“, danach „Aktuelles Passwort:“ bzw. „Neues Passwort:“ – keine englische Zeile |
+| Ü9 | GTK-Texte: `dpkg -l language-pack-gnome-de-base`; Zeiger auf das Auge im Passwortfeld | mit dem Paket „Text anzeigen“; ohne bleibt es „Show Text“ (Grenze, `docs/uebersetzung.md`) |
 
 ## Belege und Rückmeldung
 
-- Bildschirmfotos `G7`, `G8`, `G8b`, `G11`, `G11a`, `G12`, `G12a`, `G18`, `S3`, `Ü1`–`Ü6`; Befehlsausgaben
+- Bildschirmfotos `G7`, `G8`, `G8b`, `G11`, `G11a`, `G12`, `G12a`, `G18`, `S3`, `Ü1`–`Ü9`; Befehlsausgaben
   der übrigen Punkte; `/var/log/querencia-anmeldung/log` und
   `journalctl -b -u querencia-anmeldung` bei jedem FAIL.
-- Seit 0.1.2 übersetzt ein DEP-3-Patch die sichtbaren Texte von ReGreet
-  (`docs/uebersetzung.md`); Texte, die nicht im Katalog stehen (seltene
-  PAM-Meldungen), bleiben englisch.
+- Seit 0.1.2 übersetzt ein DEP-3-Patch die sichtbaren Texte von ReGreet,
+  seit 0.1.3 auch die Meldungen von PAM (`docs/uebersetzung.md`); englisch
+  bleiben nur PAM-Meldungen mit Zahlen und der Fehlercode hinter
+  „Anmeldung fehlgeschlagen:“. Vor der VM gibt es die isolierte Probe
+  `tests/sprache-probe.sh` (Fotos, ohne greetd und PAM).
 - Nach der Prüfung die VM auf den Ausgangssnapshot zurücksetzen.
