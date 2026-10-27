@@ -40,6 +40,29 @@ if [ "${QUERENCIA_PROBE_INNEN:-}" != ja ]; then
         sh "$0" "$@"
 fi
 
+# Am Ende alle Prozesse dieses Benutzer-Namensraums beenden (greetd,
+# labwc, Schein-Bus, Mitschnitt, Syslog-Fänger): Der Namensraum gehört nur
+# dieser Probe. $(jobs -p) wäre in sh leer, die Hintergrundprozesse
+# blieben sonst stehen.
+# Nur im eigenen Namensraum weitermachen (im ersten Namensraum bildet
+# uid_map alle 4294967295 IDs ab).
+if awk '$3 == 4294967295 { f = 1 } END { exit !f }' /proc/self/uid_map; then
+    echo "passwort-probe: nicht im eigenen Namensraum, Abbruch" >&2
+    exit 1
+fi
+EIGEN=$(readlink /proc/$$/ns/user)
+aufraeumen() {
+    for d in /proc/[0-9]*; do
+        p=${d#/proc/}
+        [ "$p" = $$ ] && continue
+        if [ "$(readlink "$d/ns/user" 2>/dev/null)" = "$EIGEN" ]; then
+            kill "$p" 2>/dev/null || true
+        fi
+    done
+    return 0
+}
+trap aufraeumen EXIT
+
 kurz=${SPRACHE%%_*}
 LOG=$AUS/log-$kurz.txt
 IPC=$AUS/ipc-$kurz.txt
@@ -189,7 +212,6 @@ EOF
 
 LD_PRELOAD=$W/vt-attrappe.so greetd --config "$W/greetd.toml" >>"$AUS/greetd-$kurz.log" 2>&1 &
 GREETD=$!
-trap 'kill $(jobs -p) 2>/dev/null || true' EXIT
 i=0
 while [ ! -S /run/greeter/wayland-0 ] && [ $i -lt 100 ]; do sleep 0.2; i=$((i + 1)); done
 export XDG_RUNTIME_DIR=/run/greeter WAYLAND_DISPLAY=wayland-0
