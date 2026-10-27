@@ -19,7 +19,8 @@ Seit 0.1.2 wendet das Paket einen DEP-3-Patch an
 (`debian/patches/0001-gettext-uhr-nach-lc-time.patch` in
 `querencia-packaging/querencia-anmeldung/`): sichtbare Texte über gettext,
 Sprache der Uhr aus `LC_TIME`; seit 0.1.3 auch die Meldungen von PAM (mit
-Rückfall auf den Katalog `Linux-PAM`). Einzelheiten und Begründung:
+Rückfall auf den Katalog `Linux-PAM`), seit 0.1.4 eine eigene Meldung bei
+abgelaufenem Passwort. Einzelheiten und Begründung:
 `docs/uebersetzung.md`. Spiegel und Hauptarchiv bleiben der unveränderte
 Tag `0.5.0`.
 

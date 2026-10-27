@@ -11,8 +11,8 @@
 # sein soll als der von Linux-PAM.
 msgid ""
 msgstr ""
-"Project-Id-Version: querencia-anmeldung 0.1.3\n"
-"PO-Revision-Date: 2026-10-26 23:30+0100\n"
+"Project-Id-Version: querencia-anmeldung 0.1.4\n"
+"PO-Revision-Date: 2026-10-27 15:10+0100\n"
 "Last-Translator: pottrauschen\n"
 "Language-Team: Deutsch\n"
 "Language: de\n"
@@ -62,6 +62,14 @@ msgstr "Keine Sitzung und keine Anmelde-Shell gefunden"
 
 msgid "Failed to start session"
 msgstr "Die Sitzung konnte nicht gestartet werden"
+
+# Abgelaufenes Passwort (PAM NEW_AUTHTOK_REQD): greetd kann es nicht
+# ändern, deshalb der Weg über die Textkonsole (tty1)
+msgid "Your password has expired. Please choose a new one."
+msgstr "Ihr Passwort ist abgelaufen. Bitte wählen Sie ein neues."
+
+msgid "To do so, log in on the text console (Ctrl+Alt+F1); Ctrl+Alt+F7 brings you back here."
+msgstr "Dazu an der Textkonsole anmelden (Strg+Alt+F1); Strg+Alt+F7 führt hierher zurück."
 
 # Eingabeaufforderungen von PAM (pam_unix), ohne Leerzeichen am Ende
 msgid "Password:"

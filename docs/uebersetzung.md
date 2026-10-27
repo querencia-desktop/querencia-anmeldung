@@ -27,7 +27,7 @@ Quelltext. Das Paket wendet deshalb einen einzigen DEP-3-Patch an:
 |---|---|
 | `src/gui/mod.rs` | `tr(msgid)` = `glib::dgettext(Some("querencia-anmeldung"), msgid)`; `tr_pam(msgid)` für Texte von PAM: erst `tr`, dann `dgettext(Some("Linux-PAM"), msgid)` (seit 0.1.3) |
 | `src/gui/templates.rs` | Beschriftungen, Knöpfe und Tooltips über `tr` |
-| `src/gui/model.rs` | Eingabeaufforderungen, Info- und Fehlermeldungen von PAM über `tr_pam` (Meldungen seit 0.1.3), eigene Fehlermeldungen über `tr`; abgelehntes Passwort (`AUTH_ERR`) als „Wrong password. Please try again.“ statt „Login failed: Pam_authenticate: AUTH_ERR“ |
+| `src/gui/model.rs` | Eingabeaufforderungen, Info- und Fehlermeldungen von PAM über `tr_pam` (Meldungen seit 0.1.3), eigene Fehlermeldungen über `tr`; abgelehntes Passwort (`AUTH_ERR`) als „Wrong password. Please try again.“ statt „Login failed: Pam_authenticate: AUTH_ERR“; abgelaufenes Passwort (`NEW_AUTHTOK_REQD`, seit 0.1.4) als zweizeilige Meldung mit Hinweis auf die Textkonsole, eine Minute sichtbar |
 | `src/gui/widget/clock.rs` | Sprache der Uhr aus `LC_ALL`, `LC_TIME`, `LANG` |
 
 glib kommt mit gtk4 und relm4: keine neue Crate, `Cargo.lock` bleibt
@@ -57,6 +57,16 @@ Warum die Uhr englisch war: ReGreet nimmt die Sprache der Uhr aus
   `tests/sprache-texte.txt` stimmen (eigener Katalog genau; Linux-PAM und
   GTK nur, wenn deren Kataloge und die Locale `de_DE` auf dem Prüfrechner
   liegen, sonst SKIP).
+- `tests/passwort-probe.sh` (seit 0.1.4) prüft den Weg über greetd und
+  PAM: echtes greetd und der PAM-Dienst `greetd` des Systems mit einem
+  Wegwerf-Benutzer (`useradd`, zufälliges Passwort, `chage -d 0`) unter
+  einem Overlay auf `/etc` in einem Benutzer-Namensraum mit
+  untergeordneten IDs (`unshare --map-auto`). Statt einer Konsole bekommt
+  greetd ein pty und die Vorladebibliothek `tests/vt-attrappe.c`
+  (VT-Aufrufe und `mlockall` wirkungslos). Ein Mitschnitt zwischen ReGreet
+  und greetd (`tests/passwort-probe-ipc.py`) schreibt das Protokoll nach
+  `ipc-<sprache>.txt`, Antworten ohne Inhalt; PAM schreibt in
+  `syslog-<sprache>.txt` statt ins Journal.
 - `tests/sprache-probe.sh` fotografiert den Anmeldebildschirm isoliert:
   das gebaute ReGreet im Demo-Modus in einem kopflosen labwc, in einem
   eigenen Benutzer- und Mount-Namensraum (Katalog, Sitzungen und ein
@@ -79,7 +89,27 @@ Warum die Uhr englisch war: ReGreet nimmt die Sprache der Uhr aus
   dann der Katalog `Linux-PAM` des Systems (unter Ubuntu in
   `language-pack-de-base`, das jedes deutsche System hat). Meldungen mit
   Zahlen („… in 3 days“) bleiben englisch, ebenso der technische Teil von
-  „Anmeldung fehlgeschlagen: Pam_acct_mgmt: …“ (Fehlercode von greetd).
+  „Anmeldung fehlgeschlagen: Pam_acct_mgmt: …“ (Fehlercode von greetd)
+  für seltene Fälle wie ein abgelaufenes Konto (`ACCT_EXPIRED`).
+- Abgelaufenes Passwort (seit 0.1.4, nach `chage -d 0`, `passwd -e` oder
+  überschrittener Höchstdauer): greetd 0.10.3 kann kein Passwort ändern;
+  es ruft `pam_chauthtok` nicht auf (`nm -D /usr/sbin/greetd`). Gemessen
+  mit `tests/passwort-probe.sh` laufen nach dem richtigen Passwort zwei
+  Nachrichten: erst die Meldung von PAM („You are required to change your
+  password immediately (administrator enforced).“, Typ `error`), ReGreet
+  bestätigt sie leer, dann beendet greetd die Anmeldung mit `error`/
+  `auth_error` „pam_acct_mgmt: NEW_AUTHTOK_REQD“. Die zweite Nachricht
+  überschrieb die übersetzte erste sofort. Seit 0.1.4 zeigt ReGreet dafür
+  „Ihr Passwort ist abgelaufen. Bitte wählen Sie ein neues.“ und darunter
+  „Dazu an der Textkonsole anmelden (Strg+Alt+F1); Strg+Alt+F7 führt
+  hierher zurück.“ (englisch „Your password has expired. Please choose a
+  new one.“ / „To do so, log in on the text console (Ctrl+Alt+F1);
+  Ctrl+Alt+F7 brings you back here.“), eine Minute lang. Auf tty1 läuft
+  `getty@tty1` (`config/greetd/config.toml`); `login` fragt dort nach dem
+  alten und zweimal nach dem neuen Passwort. Einen Wechsel im
+  Anmeldebildschirm selbst gäbe es nur mit einem greetd, das nach
+  `NEW_AUTHTOK_REQD` `pam_chauthtok` aufruft; greetd ist ein Paket der
+  Distribution und wird nicht gepatcht.
 - Sitzungsnamen (seit 0.1.3): `sitzung-starten --pruefen` nimmt `Name[…]`
   in der Sprache der Umgebung wie GLib (`LANGUAGE`, sonst `LC_ALL`,
   `LC_MESSAGES`, `LANG`; je Sprache `de_DE@mod`, `de_DE`, `de@mod`, `de`),
