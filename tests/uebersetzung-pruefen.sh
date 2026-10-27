@@ -76,6 +76,12 @@ if grep -q 'fn tr_pam' "$Q/src/gui/mod.rs"; then
 else
     nein "mod.rs: tr_pam fehlt (Patch vor 0.1.3?)"
 fi
+# Abgelaufenes Passwort: eigene Meldung statt des Fehlercodes von greetd
+if grep -q 'ends_with("NEW_AUTHTOK_REQD")' "$M"; then
+    ok "model.rs: eigene Meldung bei abgelaufenem Passwort (NEW_AUTHTOK_REQD)"
+else
+    nein "model.rs: abgelaufenes Passwort zeigt den Fehlercode (Patch vor 0.1.4?)"
+fi
 
 # Erwartete Texte (tests/sprache-texte.txt)
 python3 -I "$(dirname "$0")/sprache-texte-pruefen.py" "$PO" "$(dirname "$0")/sprache-texte.txt" || fehler=1

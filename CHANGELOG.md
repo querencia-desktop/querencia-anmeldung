@@ -1,5 +1,27 @@
 # Änderungen
 
+## 0.1.4 – 27.10.2026
+
+- Abgelaufenes Passwort (z. B. nach `chage -d 0` oder `passwd -e`): Der
+  Anmeldebildschirm sagt jetzt „Ihr Passwort ist abgelaufen. Bitte wählen
+  Sie ein neues.“ und darunter, wie es geht: an der Textkonsole anmelden
+  (Strg+Alt+F1), dort das neue Passwort festlegen, mit Strg+Alt+F7 zurück.
+  Englisch: „Your password has expired. Please choose a new one.“ Die
+  Meldung bleibt eine Minute stehen statt fünf Sekunden. Vorher stand dort
+  nur „Anmeldung fehlgeschlagen: Pam_acct_mgmt: NEW_AUTHTOK_REQD“ (Befund
+  Weg B Alpha 3.3, P-1).
+- Ursache, gemessen: greetd 0.10.3 kann kein Passwort ändern (ruft
+  `pam_chauthtok` nicht auf). Nach dem richtigen Passwort kommt die
+  Meldung von PAM („Passwort sofort ändern“), gleich danach beendet greetd
+  die Anmeldung mit `NEW_AUTHTOK_REQD`; diese Zeile überschrieb die
+  übersetzte Meldung aus 0.1.3 sofort. Den Wechsel im Anmeldebildschirm
+  selbst gibt es deshalb nicht.
+- Neue isolierte Passwortprobe `tests/passwort-probe.sh`: echtes greetd
+  und echtes PAM mit einem Wegwerf-Benutzer in einem Namensraum
+  (falsches, abgelaufenes, gültiges Passwort; Fotos und Mitschnitt des
+  greetd-Protokolls). `tests/uebersetzung-pruefen.sh` prüft die neue
+  Meldung. Prüfliste Ü8 an das neue Verhalten angepasst.
+
 ## 0.1.3 – 26.10.2026
 
 - Durchgehend zweisprachig: bei Deutsch alles deutsch, bei Englisch alles

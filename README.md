@@ -30,8 +30,8 @@ German.
 
 | | |
 |---|---|
-| Version | 0.1.3 (Anmeldebildschirm durchgehend in der Systemsprache Deutsch oder Englisch, auch Sitzungsnamen und Meldungen von PAM); seit 0.1.2 Übersetzung über gettext, Uhr in der Zeitsprache, Info-Zeile; seit 0.1.1 Sitzungshülle, Sitzungsfilter, Vorwahl |
-| Letzte Prüfung | 26.10.2026 (0.1.3): `tests/konfig-pruefen.sh`, `tests/uebersetzung-pruefen.sh`, isolierte Sprachprobe `tests/sprache-probe.sh` (de und en). 22.10.2026 (0.1.2): `tests/uebersetzung-pruefen.sh`, `tests/konfig-pruefen.sh` mit Info-Zeile, Prüfliste Abschnitt Ü auf einer Test-VM. 20.10.2026 (0.1.1): `konfig-pruefen` 75/0, Umschaltung 30/0, Paketprüfung 236/0, Lintian ohne Fehler und Warnungen, Weg G der Prüfliste auf einer Test-VM bestanden (bekannte Grenze: GNOME-Sperre) |
+| Version | 0.1.4 (klare Meldung bei abgelaufenem Passwort mit Hinweis auf die Textkonsole); seit 0.1.3 Anmeldebildschirm durchgehend in der Systemsprache Deutsch oder Englisch, auch Sitzungsnamen und Meldungen von PAM); seit 0.1.2 Übersetzung über gettext, Uhr in der Zeitsprache, Info-Zeile; seit 0.1.1 Sitzungshülle, Sitzungsfilter, Vorwahl |
+| Letzte Prüfung | 27.10.2026 (0.1.4): `tests/uebersetzung-pruefen.sh`, `tests/konfig-pruefen.sh`, isolierte Passwortprobe `tests/passwort-probe.sh` mit echtem greetd und PAM (de und en). 26.10.2026 (0.1.3): `tests/konfig-pruefen.sh`, `tests/uebersetzung-pruefen.sh`, isolierte Sprachprobe `tests/sprache-probe.sh` (de und en). 22.10.2026 (0.1.2): `tests/uebersetzung-pruefen.sh`, `tests/konfig-pruefen.sh` mit Info-Zeile, Prüfliste Abschnitt Ü auf einer Test-VM. 20.10.2026 (0.1.1): `konfig-pruefen` 75/0, Umschaltung 30/0, Paketprüfung 236/0, Lintian ohne Fehler und Warnungen, Weg G der Prüfliste auf einer Test-VM bestanden (bekannte Grenze: GNOME-Sperre) |
 | Getestet auf | Ubuntu 26.04, greetd aus dem Archiv, labwc 0.9.8, ReGreet 0.5.0 |
 | Nicht getestet | andere Distributionen, Mehrmonitor, fremde Rechner |
 
@@ -42,8 +42,8 @@ German.
 Nur die Querencia-Teile; ReGreet selbst kommt aus dem Upstream-Release
 0.5.0 und wird erst beim Paketbau dazugelegt (`docs/regreet-herkunft.md`).
 Ein einziger, kleiner Patch im Packaging übersetzt seine sichtbaren Texte
-und die Meldungen von PAM und stellt die Uhr auf die Zeitsprache des
-Systems (`docs/uebersetzung.md`).
+und die Meldungen von PAM, erklärt ein abgelaufenes Passwort und stellt
+die Uhr auf die Zeitsprache des Systems (`docs/uebersetzung.md`).
 
 **Sprache:** Der Anmeldebildschirm folgt der Systemsprache
 (`/etc/default/locale`, unter Ubuntu `localectl set-locale`): bei Deutsch
@@ -67,6 +67,7 @@ bleiben GTK-eigene Texte wie der Tooltip am Auge im Passwortfeld englisch.
 | `tests/konfig-pruefen.sh` | statische Prüfung (läuft auch beim Paketbau) | – |
 | `tests/uebersetzung-pruefen.sh` | Texte des gepatchten ReGreet gegen `po/de.po`, keine englischen Reste, erwartete Texte aus `tests/sprache-texte.txt` (läuft beim Paketbau) | – |
 | `tests/sprache-probe.sh` | isolierte Sprachprobe: Fotos des gebauten Anmeldebildschirms in einer Sprache, ohne Systemänderung | – |
+| `tests/passwort-probe.sh` | isolierte Passwortprobe: echtes greetd und PAM mit Wegwerf-Benutzer (falsches, abgelaufenes, gültiges Passwort), Fotos und Protokollmitschnitt, ohne Systemänderung | – |
 | `werkzeuge/paket-bauen.sh` | baut das Debian-Paket nach `build/` | – |
 
 Das Debian-Paket `querencia-anmeldung` (`debian/`, debconf-Umschaltung)
