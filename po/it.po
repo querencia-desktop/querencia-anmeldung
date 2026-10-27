@@ -1,0 +1,81 @@
+# Italienische Übersetzung des Anmeldebildschirms von Querencia Desktop.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Gleiche Texte und Reihenfolge wie po/de.po (dort die Erklärungen);
+# Begriffe nach der Querencia-Begriffstabelle (GNOME/GDM in dieser
+# Sprache). tests/uebersetzung-pruefen.sh gleicht alle Kataloge mit
+# dem gepatchten ReGreet ab.
+msgid ""
+msgstr ""
+"Project-Id-Version: querencia-anmeldung 0.1.5\n"
+"PO-Revision-Date: 2026-10-27 22:30+0100\n"
+"Last-Translator: pottrauschen\n"
+"Language-Team: Italiano\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "User:"
+msgstr "Utente:"
+
+msgid "Session:"
+msgstr "Sessione:"
+
+msgid "Manually enter username"
+msgstr "Inserire il nome utente"
+
+msgid "Manually enter session command"
+msgstr "Inserire il comando della sessione"
+
+msgid "Cancel"
+msgstr "Annulla"
+
+msgid "Login"
+msgstr "Accedi"
+
+msgid "Reboot"
+msgstr "Riavvia"
+
+msgid "Power Off"
+msgstr "Spegni"
+
+msgid "Invalid session command"
+msgstr "Comando della sessione non valido"
+
+msgid "Wrong password. Please try again."
+msgstr "Password errata. Riprovare."
+
+msgid "Login failed:"
+msgstr "Accesso non riuscito:"
+
+msgid "Session not found"
+msgstr "Sessione non trovata"
+
+msgid "No session or login shell found"
+msgstr "Nessuna sessione né shell di accesso trovata"
+
+msgid "Failed to start session"
+msgstr "Impossibile avviare la sessione"
+
+msgid "Your password has expired. Please choose a new one."
+msgstr "La password è scaduta. Sceglierne una nuova."
+
+msgid "To do so, log in on the text console (Ctrl+Alt+F1); Ctrl+Alt+F7 brings you back here."
+msgstr "Per farlo, accedere alla console testuale (Ctrl+Alt+F1); Ctrl+Alt+F7 riporta qui."
+
+msgid "Password:"
+msgstr "Password:"
+
+msgid "Current password:"
+msgstr "Password attuale:"
+
+msgid "New password:"
+msgstr "Nuova password:"
+
+msgid "Retype new password:"
+msgstr "Ripetere la nuova password:"
+
+msgid "One-Time Password:"
+msgstr "Password monouso:"

@@ -1,36 +1,39 @@
 # Erwartete Texte des Anmeldebildschirms: Englisch (Quelltext, bei en_US)
-# und Deutsch (bei de_DE). Geprüft von tests/uebersetzung-pruefen.sh;
-# dieselbe Liste gilt für die Fotos der Sprachprobe (tests/sprache-probe.sh),
-# der Passwortprobe (tests/passwort-probe.sh) und für Abschnitt Ü der
-# Prüfliste.
+# und die Übersetzungen (de_DE, it_IT, es_ES, fr_FR). Geprüft von
+# tests/uebersetzung-pruefen.sh; dieselbe Liste gilt für die Fotos der
+# Sprachprobe (tests/sprache-probe.sh), der Passwortprobe
+# (tests/passwort-probe.sh) und für Abschnitt Ü der Prüfliste.
 #
-# Spalten mit "|" getrennt: Quelle | Englisch | Deutsch
-#   katalog    po/de.po dieses Pakets (Pflicht, sonst FAIL)
-#   linux-pam  Katalog Linux-PAM.mo des Systems (language-pack-de-base);
+# Spalten mit "|" getrennt: Quelle | Englisch | Deutsch | Italienisch |
+# Spanisch | Französisch
+#   katalog    po/<sprache>.po dieses Pakets (Pflicht, sonst FAIL)
+#   linux-pam  Katalog Linux-PAM.mo des Systems (language-pack-<sprache>-base);
 #              fehlt er auf dem Prüfrechner: SKIP
-#   gtk        Katalog gtk40.mo des Systems (language-pack-gnome-de-base);
+#   gtk        Katalog gtk40.mo des Systems (language-pack-gnome-<sprache>-base);
 #              fehlt er: SKIP (dann bleiben diese Texte englisch)
-katalog|User:|Benutzer:
-katalog|Session:|Sitzung:
-katalog|Login|Anmelden
-katalog|Cancel|Abbrechen
-katalog|Reboot|Neu starten
-katalog|Power Off|Ausschalten
-katalog|Manually enter username|Benutzernamen eingeben
-katalog|Manually enter session command|Sitzungsbefehl eingeben
-katalog|Password:|Passwort:
-katalog|Wrong password. Please try again.|Falsches Passwort. Bitte erneut versuchen.
-katalog|Login failed:|Anmeldung fehlgeschlagen:
-katalog|Your password has expired. Please choose a new one.|Ihr Passwort ist abgelaufen. Bitte wählen Sie ein neues.
-katalog|To do so, log in on the text console (Ctrl+Alt+F1); Ctrl+Alt+F7 brings you back here.|Dazu an der Textkonsole anmelden (Strg+Alt+F1); Strg+Alt+F7 führt hierher zurück.
-katalog|Current password:|Aktuelles Passwort:
-katalog|New password:|Neues Passwort:
-katalog|Retype new password:|Neues Passwort wiederholen:
-katalog|One-Time Password:|Einmalpasswort:
-linux-pam|You are required to change your password immediately (administrator enforced).|Sie müssen Ihr Passwort sofort ändern (von root erzwungen).
-linux-pam|You are required to change your password immediately (password expired).|Sie müssen Ihr Passwort sofort ändern (Passwortablauf).
-linux-pam|Your account has expired; please contact your system administrator.|Ihr Konto ist abgelaufen. Wenden Sie sich an den Systemadministrator.
-linux-pam|Sorry, passwords do not match.|Die Passwörter stimmen nicht überein.
-gtk|Show Text|Text anzeigen
-gtk|Hide Text|Text verbergen
-gtk|Caps Lock is on|Feststelltaste ist aktiviert
+# "-": Wortlaut des Systemkatalogs, hier nicht festgelegt (geprüft wird
+# nur, dass er übersetzt).
+katalog|User:|Benutzer:|Utente:|Usuario:|Utilisateur :
+katalog|Session:|Sitzung:|Sessione:|Sesión:|Session :
+katalog|Login|Anmelden|Accedi|Iniciar sesión|Se connecter
+katalog|Cancel|Abbrechen|Annulla|Cancelar|Annuler
+katalog|Reboot|Neu starten|Riavvia|Reiniciar|Redémarrer
+katalog|Power Off|Ausschalten|Spegni|Apagar|Éteindre
+katalog|Manually enter username|Benutzernamen eingeben|Inserire il nome utente|Introducir el nombre de usuario|Saisir le nom d’utilisateur
+katalog|Manually enter session command|Sitzungsbefehl eingeben|Inserire il comando della sessione|Introducir el comando de la sesión|Saisir la commande de session
+katalog|Password:|Passwort:|Password:|Contraseña:|Mot de passe :
+katalog|Wrong password. Please try again.|Falsches Passwort. Bitte erneut versuchen.|Password errata. Riprovare.|Contraseña incorrecta. Inténtelo de nuevo.|Mot de passe incorrect. Veuillez réessayer.
+katalog|Login failed:|Anmeldung fehlgeschlagen:|Accesso non riuscito:|Error al iniciar sesión:|Échec de la connexion :
+katalog|Your password has expired. Please choose a new one.|Ihr Passwort ist abgelaufen. Bitte wählen Sie ein neues.|La password è scaduta. Sceglierne una nuova.|Su contraseña ha caducado. Elija una nueva.|Votre mot de passe a expiré. Veuillez en choisir un nouveau.
+katalog|To do so, log in on the text console (Ctrl+Alt+F1); Ctrl+Alt+F7 brings you back here.|Dazu an der Textkonsole anmelden (Strg+Alt+F1); Strg+Alt+F7 führt hierher zurück.|Per farlo, accedere alla console testuale (Ctrl+Alt+F1); Ctrl+Alt+F7 riporta qui.|Para ello, inicie sesión en la consola de texto (Ctrl+Alt+F1); Ctrl+Alt+F7 le devuelve aquí.|Pour cela, connectez-vous sur la console texte (Ctrl+Alt+F1) ; Ctrl+Alt+F7 vous ramène ici.
+katalog|Current password:|Aktuelles Passwort:|Password attuale:|Contraseña actual:|Mot de passe actuel :
+katalog|New password:|Neues Passwort:|Nuova password:|Contraseña nueva:|Nouveau mot de passe :
+katalog|Retype new password:|Neues Passwort wiederholen:|Ripetere la nuova password:|Repita la contraseña nueva:|Retapez le nouveau mot de passe :
+katalog|One-Time Password:|Einmalpasswort:|Password monouso:|Contraseña de un solo uso:|Mot de passe à usage unique :
+linux-pam|You are required to change your password immediately (administrator enforced).|Sie müssen Ihr Passwort sofort ändern (von root erzwungen).|-|-|-
+linux-pam|You are required to change your password immediately (password expired).|Sie müssen Ihr Passwort sofort ändern (Passwortablauf).|-|-|-
+linux-pam|Your account has expired; please contact your system administrator.|Ihr Konto ist abgelaufen. Wenden Sie sich an den Systemadministrator.|-|-|-
+linux-pam|Sorry, passwords do not match.|Die Passwörter stimmen nicht überein.|-|-|-
+gtk|Show Text|Text anzeigen|-|-|-
+gtk|Hide Text|Text verbergen|-|-|-
+gtk|Caps Lock is on|Feststelltaste ist aktiviert|-|-|-

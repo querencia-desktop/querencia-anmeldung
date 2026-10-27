@@ -20,12 +20,16 @@
 # <paketwurzel>  entpacktes querencia-anmeldung_*.deb (dpkg-deb -x)
 # <themawurzel>  entpackte querencia-shell und querencia-symbole; "" geht
 # <ausgabe>      Ordner für <sprache>-NN-*.png, ipc-<sprache>.txt und Logs
-# <locale>       z. B. de_DE.UTF-8 oder en_US.UTF-8 (muss erzeugt sein)
+# <locale>       de_DE.UTF-8, en_US.UTF-8, it_IT.UTF-8, es_ES.UTF-8 oder
+#                fr_FR.UTF-8; fehlt sie auf dem Rechner, erzeugt die Probe
+#                sie nur im Namensraum (localedef)
 #
 # Braucht greetd, labwc, grim, wlrctl, wtype, gcc, dbus-daemon, python3-gi,
 # unshare mit --map-auto (newuidmap) und Einträge in /etc/subuid und
 # /etc/subgid. Exit 0 = Probe durchgelaufen; den Inhalt zeigen die Fotos
-# und ipc-<sprache>.txt.
+# und ipc-<sprache>.txt. Am Ende beendet die Probe alle Prozesse ihres
+# Namensraums; log-<sprache>.txt nennt den Namensraum und XDG_RUNTIME_DIR
+# des Anmeldebildschirms, damit sich das nachprüfen lässt.
 set -eu
 PAKET=$(realpath "${1:?Paketwurzel fehlt}")
 THEMA=${2-}
@@ -40,28 +44,8 @@ if [ "${QUERENCIA_PROBE_INNEN:-}" != ja ]; then
         sh "$0" "$@"
 fi
 
-# Am Ende alle Prozesse dieses Benutzer-Namensraums beenden (greetd,
-# labwc, Schein-Bus, Mitschnitt, Syslog-Fänger): Der Namensraum gehört nur
-# dieser Probe. $(jobs -p) wäre in sh leer, die Hintergrundprozesse
-# blieben sonst stehen.
-# Nur im eigenen Namensraum weitermachen (im ersten Namensraum bildet
-# uid_map alle 4294967295 IDs ab).
-if awk '$3 == 4294967295 { f = 1 } END { exit !f }' /proc/self/uid_map; then
-    echo "passwort-probe: nicht im eigenen Namensraum, Abbruch" >&2
-    exit 1
-fi
-EIGEN=$(readlink /proc/$$/ns/user)
-aufraeumen() {
-    for d in /proc/[0-9]*; do
-        p=${d#/proc/}
-        [ "$p" = $$ ] && continue
-        if [ "$(readlink "$d/ns/user" 2>/dev/null)" = "$EIGEN" ]; then
-            kill "$p" 2>/dev/null || true
-        fi
-    done
-    return 0
-}
-trap aufraeumen EXIT
+. "$HIER/probe-gemeinsam.sh"
+probe_aufraeumen_vorbereiten
 
 kurz=${SPRACHE%%_*}
 LOG=$AUS/log-$kurz.txt
@@ -76,6 +60,9 @@ mount -t tmpfs -o mode=700 none /mnt
 mkdir -m 700 /mnt/w /mnt/orig /mnt/oben /mnt/arbeit
 W=/mnt/w
 mount -t tmpfs -o mode=755 none /run
+LAUF=/run/greeter-$(head -c 4 /dev/urandom | od -An -tx1 | tr -d ' \n')
+echo "Namensraum $PROBE_NS XDG_RUNTIME_DIR=$LAUF" >>"$LOG"
+probe_locale "$SPRACHE" "$W" >>"$LOG" 2>&1
 [ -d /tmp/.X11-unix ] && mount -t tmpfs none /tmp/.X11-unix
 
 # /etc unter einem Overlay. Dateien, die das Overlay sonst aus dem
@@ -190,8 +177,8 @@ rm -f /run/mitschnitt.sock
 python3 -I "$HIER/passwort-probe-ipc.py" /run/mitschnitt.sock "\$GREETD_SOCK" "$IPC" &
 while [ ! -S /run/mitschnitt.sock ]; do sleep 0.1; done
 export GREETD_SOCK=/run/mitschnitt.sock
-mkdir -p -m 700 /run/greeter
-export XDG_RUNTIME_DIR=/run/greeter
+mkdir -p -m 700 $LAUF
+export XDG_RUNTIME_DIR=$LAUF
 export WLR_BACKENDS=headless WLR_RENDERER=pixman WLR_LIBINPUT_NO_DEVICES=1 WLR_HEADLESS_OUTPUTS=1
 export QUERENCIA_ANMELDUNG_REGREET="$PAKET/usr/libexec/querencia-anmeldung/regreet -l $AUS/regreet-$kurz.log"
 export QUERENCIA_ANMELDUNG_AUSWAHL="$PAKET/usr/libexec/querencia-anmeldung/sitzungen-auswahl"
@@ -213,8 +200,8 @@ EOF
 LD_PRELOAD=$W/vt-attrappe.so greetd --config "$W/greetd.toml" >>"$AUS/greetd-$kurz.log" 2>&1 &
 GREETD=$!
 i=0
-while [ ! -S /run/greeter/wayland-0 ] && [ $i -lt 100 ]; do sleep 0.2; i=$((i + 1)); done
-export XDG_RUNTIME_DIR=/run/greeter WAYLAND_DISPLAY=wayland-0
+while [ ! -S "$LAUF/wayland-0" ] && [ $i -lt 100 ]; do sleep 0.2; i=$((i + 1)); done
+export XDG_RUNTIME_DIR=$LAUF WAYLAND_DISPLAY=wayland-0
 sleep 4
 
 foto() { grim "$AUS/$kurz-$1.png"; echo "Foto $kurz-$1.png" >>"$LOG"; }

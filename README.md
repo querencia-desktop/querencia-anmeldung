@@ -30,7 +30,7 @@ German.
 
 | | |
 |---|---|
-| Version | 0.1.4 (klare Meldung bei abgelaufenem Passwort mit Hinweis auf die Textkonsole); seit 0.1.3 Anmeldebildschirm durchgehend in der Systemsprache Deutsch oder Englisch, auch Sitzungsnamen und Meldungen von PAM); seit 0.1.2 Übersetzung über gettext, Uhr in der Zeitsprache, Info-Zeile; seit 0.1.1 Sitzungshülle, Sitzungsfilter, Vorwahl |
+| Version | 0.1.5 (Anmeldebildschirm auch auf Italienisch, Spanisch, Französisch); seit 0.1.4 klare Meldung bei abgelaufenem Passwort mit Hinweis auf die Textkonsole); seit 0.1.3 Anmeldebildschirm durchgehend in der Systemsprache Deutsch oder Englisch, auch Sitzungsnamen und Meldungen von PAM); seit 0.1.2 Übersetzung über gettext, Uhr in der Zeitsprache, Info-Zeile; seit 0.1.1 Sitzungshülle, Sitzungsfilter, Vorwahl |
 | Letzte Prüfung | 27.10.2026 (0.1.4): `tests/uebersetzung-pruefen.sh`, `tests/konfig-pruefen.sh`, isolierte Passwortprobe `tests/passwort-probe.sh` mit echtem greetd und PAM (de und en). 26.10.2026 (0.1.3): `tests/konfig-pruefen.sh`, `tests/uebersetzung-pruefen.sh`, isolierte Sprachprobe `tests/sprache-probe.sh` (de und en). 22.10.2026 (0.1.2): `tests/uebersetzung-pruefen.sh`, `tests/konfig-pruefen.sh` mit Info-Zeile, Prüfliste Abschnitt Ü auf einer Test-VM. 20.10.2026 (0.1.1): `konfig-pruefen` 75/0, Umschaltung 30/0, Paketprüfung 236/0, Lintian ohne Fehler und Warnungen, Weg G der Prüfliste auf einer Test-VM bestanden (bekannte Grenze: GNOME-Sperre) |
 | Getestet auf | Ubuntu 26.04, greetd aus dem Archiv, labwc 0.9.8, ReGreet 0.5.0 |
 | Nicht getestet | andere Distributionen, Mehrmonitor, fremde Rechner |
@@ -48,14 +48,15 @@ die Uhr auf die Zeitsprache des Systems (`docs/uebersetzung.md`).
 **Sprache:** Der Anmeldebildschirm folgt der Systemsprache
 (`/etc/default/locale`, unter Ubuntu `localectl set-locale`): bei Deutsch
 ist alles deutsch, bei Englisch alles englisch – Beschriftungen, Uhr,
-Sitzungsnamen, Meldungen. Andere Sprachen zeigen englische Beschriftungen.
+Sitzungsnamen, Meldungen. Seit 0.1.5 ebenso Italienisch, Spanisch und
+Französisch; andere Sprachen zeigen englische Beschriftungen.
 GTK-Dialoge folgen dem Sprachpaket des Systems:
 `language-pack-gnome-<xx>` (deutsch `language-pack-gnome-de`); fehlt es,
 bleiben GTK-eigene Texte wie der Tooltip am Auge im Passwortfeld englisch.
 
 | Ordner | Inhalt | installiert nach |
 |---|---|---|
-| `po/de.po` | deutsche Übersetzung der Texte von ReGreet | `/usr/share/locale/de/LC_MESSAGES/querencia-anmeldung.mo` |
+| `po/*.po` | Übersetzungen der Texte von ReGreet: de, it, es, fr | `/usr/share/locale/<sprache>/LC_MESSAGES/querencia-anmeldung.mo` |
 | `config/greetd/` | greetd- und ReGreet-Konfiguration, labwc-Konfiguration des Anmeldebildschirms | `/etc/querencia/greetd/` |
 | `sbin/querencia-anmeldung` | startet greetd mit dieser Konfiguration | `/usr/sbin/` |
 | `libexec/anmeldung-starten` | Befehl des Anmeldebildschirms: Sitzungsauswahl, Sprache und Tastatur des Systems, dann labwc + ReGreet | `/usr/libexec/querencia-anmeldung/` |
@@ -65,7 +66,7 @@ bleiben GTK-eigene Texte wie der Tooltip am Auge im Passwortfeld englisch.
 | `tmpfiles/` | Zustands- und Protokollordner von ReGreet | `/usr/lib/tmpfiles.d/` |
 | `man/querencia-anmeldung.8` | Handbuchseite | `/usr/share/man/man8/` |
 | `tests/konfig-pruefen.sh` | statische Prüfung (läuft auch beim Paketbau) | – |
-| `tests/uebersetzung-pruefen.sh` | Texte des gepatchten ReGreet gegen `po/de.po`, keine englischen Reste, erwartete Texte aus `tests/sprache-texte.txt` (läuft beim Paketbau) | – |
+| `tests/uebersetzung-pruefen.sh` | Texte des gepatchten ReGreet gegen alle Kataloge in `po/`, keine englischen Reste, erwartete Texte aus `tests/sprache-texte.txt` (läuft beim Paketbau) | – |
 | `tests/sprache-probe.sh` | isolierte Sprachprobe: Fotos des gebauten Anmeldebildschirms in einer Sprache, ohne Systemänderung | – |
 | `tests/passwort-probe.sh` | isolierte Passwortprobe: echtes greetd und PAM mit Wegwerf-Benutzer (falsches, abgelaufenes, gültiges Passwort), Fotos und Protokollmitschnitt, ohne Systemänderung | – |
 | `werkzeuge/paket-bauen.sh` | baut das Debian-Paket nach `build/` | – |

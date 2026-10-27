@@ -13,13 +13,17 @@
 # <themawurzel>  entpackte querencia-shell und querencia-symbole (Thema,
 #                Hintergrund); leer lassen ("") geht, dann ohne Thema
 # <ausgabe>      Ordner für die Fotos <sprache>-NN-*.png und log.txt
-# <locale>       z. B. de_DE.UTF-8 oder en_US.UTF-8 (muss erzeugt sein)
+# <locale>       de_DE.UTF-8, en_US.UTF-8, it_IT.UTF-8, es_ES.UTF-8 oder
+#                fr_FR.UTF-8; fehlt sie auf dem Rechner, erzeugt die Probe
+#                sie nur im Namensraum (localedef)
 # ohne-gtk-katalog  blendet gtk40.mo aus (wie ein System ohne
 #                language-pack-gnome-<sprache>)
 #
 # Braucht labwc, grim, wlrctl, wtype, dbus-daemon, python3-gi und
 # unprivilegierte Benutzer-Namensräume. Exit 0 = Fotos erzeugt; den Inhalt
 # prüft man auf den Fotos (Liste der erwarteten Texte: tests/sprache-texte.txt).
+# Am Ende beendet die Probe alle Prozesse ihres Namensraums; log-<locale>.txt
+# nennt den Namensraum und XDG_RUNTIME_DIR, damit sich das nachprüfen lässt.
 set -eu
 PAKET=$(realpath "${1:?Paketwurzel fehlt}")
 THEMA=${2-}
@@ -34,19 +38,23 @@ if [ "${QUERENCIA_PROBE_INNEN:-}" != ja ]; then
     QUERENCIA_PROBE_INNEN=ja exec unshare -r -m --propagation private sh "$0" "$@"
 fi
 
-W=$(mktemp -d "${TMPDIR:-/tmp}/sprache-probe.XXXXXX")
-trap 'kill $(jobs -p) 2>/dev/null || true; rm -rf "$W"' EXIT
+. "$HIER/probe-gemeinsam.sh"
+probe_aufraeumen_vorbereiten
 LOG=$AUS/log-$SPRACHE.txt
 : >"$LOG"
 kurz=${SPRACHE%%_*}
 
-# Arbeitsordner nur im Namensraum (tmpfs auf /mnt): kurze Pfade für die
-# Sockets (höchstens 108 Zeichen) und die Originale der überblendeten
-# Systemordner. Sie liegen bewusst nicht in $W, das am Ende gelöscht wird.
+# Arbeitsordner nur im Namensraum (tmpfs auf /mnt, verschwindet mit ihm):
+# kurze Pfade für die Sockets (höchstens 108 Zeichen), die Originale der
+# überblendeten Systemordner, ein eigener Laufzeitordner je Lauf.
 mount -t tmpfs -o mode=700 none /mnt
-mkdir -m 700 /mnt/run /mnt/orig
+LAUF=/mnt/run-$(head -c 4 /dev/urandom | od -An -tx1 | tr -d ' \n')
+mkdir -m 700 "$LAUF" /mnt/orig /mnt/w
+W=/mnt/w
 [ -d /tmp/.X11-unix ] && mount -t tmpfs none /tmp/.X11-unix
-export XDG_RUNTIME_DIR=/mnt/run
+export XDG_RUNTIME_DIR=$LAUF
+echo "Namensraum $PROBE_NS XDG_RUNTIME_DIR=$LAUF" >>"$LOG"
+probe_locale "$SPRACHE" "$W" >>"$LOG" 2>&1
 
 # Katalog des Pakets dort einblenden, wo gettext ihn sucht
 # (/usr/share/locale/<sprache>/LC_MESSAGES), Originaldateien bleiben sichtbar.
@@ -73,7 +81,7 @@ if [ "$OHNE_GTK" = ohne-gtk-katalog ]; then
 fi
 
 # Sitzungen: mit sitzungen-auswahl des Pakets aus Probedateien erzeugt
-# (Querencia Desktop, dazu eine freigegebene Sitzung mit Name[de]).
+# (Querencia Desktop, dazu eine freigegebene Sitzung mit übersetztem Namen).
 Q=$W/quellen
 mkdir -p "$Q" "$W/konfig" "$W/lauf" "$W/share"
 cat >"$Q/querencia.desktop" <<'EOF'
@@ -88,6 +96,9 @@ cat >"$Q/probe-sitzung.desktop" <<'EOF'
 [Desktop Entry]
 Name=Test session
 Name[de]=Testsitzung
+Name[it]=Sessione di prova
+Name[es]=Sesión de prueba
+Name[fr]=Session de test
 Exec=/bin/true
 Type=Application
 DesktopNames=Probe
@@ -116,13 +127,13 @@ sed -e "s#^path = \"/usr/share/querencia/#path = \"$THEMA/usr/share/querencia/#"
 
 # eigener "Systembus" mit Schein-AccountsService (ein Benutzer)
 cat >"$W/bus.conf" <<EOF
-<busconfig><type>system</type><listen>unix:path=/mnt/run/systembus</listen>
+<busconfig><type>system</type><listen>unix:path=$LAUF/systembus</listen>
 <auth>EXTERNAL</auth><policy context="default"><allow user="*"/>
 <allow own="*"/><allow send_destination="*"/><allow receive_sender="*"/></policy></busconfig>
 EOF
 dbus-daemon --config-file="$W/bus.conf" --nofork --nopidfile >>"$LOG" 2>&1 &
 sleep 0.5
-export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/mnt/run/systembus
+export DBUS_SYSTEM_BUS_ADDRESS=unix:path=$LAUF/systembus
 python3 -I "$HIER/sprache-probe-konten.py" >>"$LOG" 2>&1 &
 sleep 1
 
