@@ -1,14 +1,19 @@
 # Übersetzung des Anmeldebildschirms
 
 Seit 0.1.2 zeigt der Anmeldebildschirm seine Texte in der Systemsprache.
-Mitgeliefert ist Deutsch, Quelltext ist Englisch. Seit 0.1.3 durchgehend:
-bei `de_DE` alles deutsch, bei `en_US` alles englisch, auch Sitzungsnamen
-und Meldungen von PAM (`tests/sprache-texte.txt` listet die erwarteten
-Texte beider Sprachen).
+Mitgeliefert sind Deutsch und seit 0.1.5 Italienisch, Spanisch und
+Französisch, Quelltext ist Englisch. Seit 0.1.3 durchgehend: bei `de_DE`
+alles deutsch, bei `en_US` alles englisch, auch Sitzungsnamen und
+Meldungen von PAM; bei `it_IT`, `es_ES` und `fr_FR` ebenso, soweit das
+System die Kataloge von Linux-PAM und GTK in dieser Sprache hat
+(`tests/sprache-texte.txt` listet die erwarteten Texte aller Sprachen).
+Die Begriffe folgen der Querencia-Begriffstabelle (GNOME/GDM der
+jeweiligen Sprache), im Französischen mit schmalem geschütztem
+Leerzeichen vor „:“ und „;“.
 
 | Text | Quelle | Deutsch kommt aus |
 |---|---|---|
-| Beschriftungen, Knöpfe, Tooltips, eigene Fehlermeldungen | ReGreet (Patch, `tr`) | `po/de.po` |
+| Beschriftungen, Knöpfe, Tooltips, eigene Fehlermeldungen | ReGreet (Patch, `tr`) | `po/de.po` (it, es, fr: `po/<sprache>.po`) |
 | Uhr | ReGreet (Patch, Uhr nach `LC_TIME`) | Zeitsprache des Systems |
 | Eingabeaufforderungen und Meldungen von PAM | greetd (ohne Sprache) | `po/de.po`, sonst Katalog `Linux-PAM` (`language-pack-de-base`) |
 | Sitzungsnamen | `Name[de]` usw. der Sitzungsdatei | `sitzung-starten`, `sitzungen-auswahl` |
@@ -42,12 +47,16 @@ Warum die Uhr englisch war: ReGreet nimmt die Sprache der Uhr aus
 
 ## Katalog und Prüfung
 
-- `po/de.po` (Domäne `querencia-anmeldung`), installiert als
-  `/usr/share/locale/de/LC_MESSAGES/querencia-anmeldung.mo` (`msgfmt -c`
-  in `debian/rules`).
-- `tests/uebersetzung-pruefen.sh <regreet-quellbaum>` sucht alle
-  `tr("…")` im gepatchten Quellbaum und prüft, dass jeder Text in
-  `po/de.po` übersetzt ist; läuft beim Paketbau nach dem Patch.
+- `po/de.po`, `po/it.po`, `po/es.po`, `po/fr.po` (Domäne
+  `querencia-anmeldung`), installiert als
+  `/usr/share/locale/<sprache>/LC_MESSAGES/querencia-anmeldung.mo`
+  (`msgfmt -c` in `debian/rules`, jeder Katalog aus `po/`). Eine neue
+  Sprache braucht nur eine neue po-Datei und eine Spalte in
+  `tests/sprache-texte.txt`.
+- `tests/uebersetzung-pruefen.sh <regreet-quellbaum> [<po-datei>...]`
+  sucht alle `tr("…")` im gepatchten Quellbaum und prüft, dass jeder Text
+  in jedem Katalog (ohne Angabe: alle in `po/`) übersetzt ist; läuft beim
+  Paketbau nach dem Patch.
   `debian/rules` prüft außerdem, dass ein Text des Patches im Binary
   steht.
 - Seit 0.1.3 prüft `tests/uebersetzung-pruefen.sh` außerdem, dass keine
@@ -72,7 +81,14 @@ Warum die Uhr englisch war: ReGreet nimmt die Sprache der Uhr aus
   eigenen Benutzer- und Mount-Namensraum (Katalog, Sitzungen und ein
   Schein-Benutzer nur dort sichtbar, nichts am System geändert). Mit
   `ohne-gtk-katalog` wie ein System ohne `language-pack-gnome-de-base`.
-- Neue Texte im Patch: in `po/de.po` eintragen, sonst scheitert der Bau.
+- Neue Texte im Patch: in alle Kataloge in `po/` eintragen, sonst
+  scheitert der Bau.
+- Beide Proben nehmen jede der fünf Sprachen. Fehlt die Locale auf dem
+  Prüfrechner (etwa `it_IT` auf einem deutschen System), erzeugt
+  `tests/probe-gemeinsam.sh` sie mit `localedef` nur im Namensraum. Am
+  Ende beendet jede Probe alle Prozesse ihres Namensraums; das Log nennt
+  Namensraum und `XDG_RUNTIME_DIR`, damit sich nachprüfen lässt, dass
+  nichts stehen bleibt.
 
 ## Sprache, Uhr, Info-Zeile
 
@@ -131,9 +147,14 @@ Warum die Uhr englisch war: ReGreet nimmt die Sprache der Uhr aus
   installiert, hat die Sprachpakete seines Systems
   (`check-language-support -l de` nennt sie); das Abbild installiert das
   Paket der gewählten Sprache.
-- Andere Systemsprachen als Deutsch und Englisch: Beschriftungen englisch
-  (kein Katalog), Uhr, Sitzungsnamen und Meldungen von PAM in der
-  Systemsprache, soweit es Übersetzungen gibt.
+- Italienisch, Spanisch, Französisch (seit 0.1.5): Beschriftungen aus dem
+  eigenen Katalog; Uhr nach `%x` der Zeitsprache (it und fr
+  „27/10/2026 22:30“, es „27/10/26 22:30“); Sitzungsnamen über `Name[it]`
+  usw.; Meldungen von PAM und GTK-eigene Texte über die Sprachpakete
+  `language-pack-<xx>-base` und `language-pack-gnome-<xx>-base`.
+- Andere Systemsprachen: Beschriftungen englisch (kein Katalog), Uhr,
+  Sitzungsnamen und Meldungen von PAM in der Systemsprache, soweit es
+  Übersetzungen gibt.
 - Info-Zeile: `anmeldung-starten` hängt die Ausgabe aus
   `/usr/share/querencia/release` (`VERSION`) bzw. der ersten Zeile von
   `/usr/share/querencia/version` an den Grußtext („Querencia Desktop Alpha

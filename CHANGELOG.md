@@ -1,5 +1,24 @@
 # Änderungen
 
+## 0.1.5 – 27.10.2026
+
+- Anmeldebildschirm auch auf Italienisch, Spanisch und Französisch: neue
+  Kataloge `po/it.po`, `po/es.po`, `po/fr.po` mit allen 21 Texten
+  (Beschriftungen, Knöpfe, Tooltips, Fehlermeldungen, Meldung bei
+  abgelaufenem Passwort samt Hinweis auf die Textkonsole), Begriffe wie
+  in den übrigen Querencia-Programmen. Vorher waren diese Sprachen
+  englisch (Befund ISO-Probe Alpha 3.4 bei italienischer Installation).
+- Uhr und Sitzungsnamen folgten der Sprache schon vorher; geprüft für
+  it/es/fr (Datum nach der Zeitsprache, `Name[it]` usw.).
+- Das Paket installiert jetzt jeden Katalog aus `po/`.
+  `tests/uebersetzung-pruefen.sh` prüft alle Kataloge,
+  `tests/sprache-texte.txt` nennt die erwarteten Texte in fünf Sprachen.
+- Sprach- und Passwortprobe laufen in jeder der fünf Sprachen, auch wenn
+  die Locale auf dem Prüfrechner fehlt (dann nur im Namensraum erzeugt),
+  und beenden am Ende alle Prozesse ihres Namensraums
+  (`tests/probe-gemeinsam.sh`); vorher blieben bei der Sprachprobe
+  Prozesse stehen.
+
 ## 0.1.4 – 27.10.2026
 
 - Abgelaufenes Passwort (z. B. nach `chage -d 0` oder `passwd -e`): Der

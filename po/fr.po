@@ -1,0 +1,81 @@
+# Französische Übersetzung des Anmeldebildschirms von Querencia Desktop.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Gleiche Texte und Reihenfolge wie po/de.po (dort die Erklärungen);
+# Begriffe nach der Querencia-Begriffstabelle (GNOME/GDM in dieser
+# Sprache). tests/uebersetzung-pruefen.sh gleicht alle Kataloge mit
+# dem gepatchten ReGreet ab.
+msgid ""
+msgstr ""
+"Project-Id-Version: querencia-anmeldung 0.1.5\n"
+"PO-Revision-Date: 2026-10-27 22:30+0100\n"
+"Last-Translator: pottrauschen\n"
+"Language-Team: Français\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "User:"
+msgstr "Utilisateur :"
+
+msgid "Session:"
+msgstr "Session :"
+
+msgid "Manually enter username"
+msgstr "Saisir le nom d’utilisateur"
+
+msgid "Manually enter session command"
+msgstr "Saisir la commande de session"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Login"
+msgstr "Se connecter"
+
+msgid "Reboot"
+msgstr "Redémarrer"
+
+msgid "Power Off"
+msgstr "Éteindre"
+
+msgid "Invalid session command"
+msgstr "Commande de session non valide"
+
+msgid "Wrong password. Please try again."
+msgstr "Mot de passe incorrect. Veuillez réessayer."
+
+msgid "Login failed:"
+msgstr "Échec de la connexion :"
+
+msgid "Session not found"
+msgstr "Session introuvable"
+
+msgid "No session or login shell found"
+msgstr "Aucune session ni shell de connexion trouvé"
+
+msgid "Failed to start session"
+msgstr "Impossible de démarrer la session"
+
+msgid "Your password has expired. Please choose a new one."
+msgstr "Votre mot de passe a expiré. Veuillez en choisir un nouveau."
+
+msgid "To do so, log in on the text console (Ctrl+Alt+F1); Ctrl+Alt+F7 brings you back here."
+msgstr "Pour cela, connectez-vous sur la console texte (Ctrl+Alt+F1) ; Ctrl+Alt+F7 vous ramène ici."
+
+msgid "Password:"
+msgstr "Mot de passe :"
+
+msgid "Current password:"
+msgstr "Mot de passe actuel :"
+
+msgid "New password:"
+msgstr "Nouveau mot de passe :"
+
+msgid "Retype new password:"
+msgstr "Retapez le nouveau mot de passe :"
+
+msgid "One-Time Password:"
+msgstr "Mot de passe à usage unique :"

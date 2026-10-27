@@ -1,0 +1,81 @@
+# Spanische Übersetzung des Anmeldebildschirms von Querencia Desktop.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Gleiche Texte und Reihenfolge wie po/de.po (dort die Erklärungen);
+# Begriffe nach der Querencia-Begriffstabelle (GNOME/GDM in dieser
+# Sprache). tests/uebersetzung-pruefen.sh gleicht alle Kataloge mit
+# dem gepatchten ReGreet ab.
+msgid ""
+msgstr ""
+"Project-Id-Version: querencia-anmeldung 0.1.5\n"
+"PO-Revision-Date: 2026-10-27 22:30+0100\n"
+"Last-Translator: pottrauschen\n"
+"Language-Team: Español\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "User:"
+msgstr "Usuario:"
+
+msgid "Session:"
+msgstr "Sesión:"
+
+msgid "Manually enter username"
+msgstr "Introducir el nombre de usuario"
+
+msgid "Manually enter session command"
+msgstr "Introducir el comando de la sesión"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Login"
+msgstr "Iniciar sesión"
+
+msgid "Reboot"
+msgstr "Reiniciar"
+
+msgid "Power Off"
+msgstr "Apagar"
+
+msgid "Invalid session command"
+msgstr "Comando de sesión no válido"
+
+msgid "Wrong password. Please try again."
+msgstr "Contraseña incorrecta. Inténtelo de nuevo."
+
+msgid "Login failed:"
+msgstr "Error al iniciar sesión:"
+
+msgid "Session not found"
+msgstr "Sesión no encontrada"
+
+msgid "No session or login shell found"
+msgstr "No se encontró ninguna sesión ni shell de inicio de sesión"
+
+msgid "Failed to start session"
+msgstr "No se pudo iniciar la sesión"
+
+msgid "Your password has expired. Please choose a new one."
+msgstr "Su contraseña ha caducado. Elija una nueva."
+
+msgid "To do so, log in on the text console (Ctrl+Alt+F1); Ctrl+Alt+F7 brings you back here."
+msgstr "Para ello, inicie sesión en la consola de texto (Ctrl+Alt+F1); Ctrl+Alt+F7 le devuelve aquí."
+
+msgid "Password:"
+msgstr "Contraseña:"
+
+msgid "Current password:"
+msgstr "Contraseña actual:"
+
+msgid "New password:"
+msgstr "Contraseña nueva:"
+
+msgid "Retype new password:"
+msgstr "Repita la contraseña nueva:"
+
+msgid "One-Time Password:"
+msgstr "Contraseña de un solo uso:"

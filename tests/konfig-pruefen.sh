@@ -206,9 +206,12 @@ pruefe "Hülle: fehlendes TryExec abgelehnt" "! pp '$Q/usr/tryexec.desktop' >/de
 pruefe "Hülle: fehlende Datei abgelehnt" "! pp '$Q/usr/gibt-es-nicht.desktop' >/dev/null"
 pruefe "Hülle: Versteckt erkannt" "pp '$Q/usr/versteckt.desktop' | grep -qx VERSTECKT=ja"
 # übersetzte Sitzungsnamen (Name[de] usw.) nach der Sprache der Umgebung
-printf '[Desktop Entry]\nName=Test session\nName[de]=Testsitzung\nName[de_CH]=Testsitzig\nName[fr]=Session\\sde test\nExec=/bin/true\n' >"$Q/usr/uebersetzt.desktop"
+printf '[Desktop Entry]\nName=Test session\nName[de]=Testsitzung\nName[de_CH]=Testsitzig\nName[fr]=Session\\sde test\nName[it]=Sessione di prova\nName[es]=Sesión de prueba\nExec=/bin/true\n' >"$Q/usr/uebersetzt.desktop"
 pn() { env -i PATH=/usr/bin:/bin "$@" sh "$H" --pruefen "$Q/usr/uebersetzt.desktop" 2>&1 | sed -n 's/^NAME=//p'; }
 pruefe "Hülle: Name[de] bei LANG=de_DE.UTF-8" "[ \"\$(pn LANG=de_DE.UTF-8)\" = Testsitzung ]"
+pruefe "Hülle: Name[it] bei LANG=it_IT.UTF-8" "[ \"\$(pn LANG=it_IT.UTF-8)\" = 'Sessione di prova' ]"
+pruefe "Hülle: Name[es] bei LANG=es_ES.UTF-8" "[ \"\$(pn LANG=es_ES.UTF-8)\" = 'Sesión de prueba' ]"
+pruefe "Hülle: Name[fr] bei LANG=fr_FR.UTF-8" "[ \"\$(pn LANG=fr_FR.UTF-8)\" = 'Session de test' ]"
 pruefe "Hülle: Name bei LANG=en_US.UTF-8" "[ \"\$(pn LANG=en_US.UTF-8)\" = 'Test session' ]"
 pruefe "Hülle: Name[de_CH] vor Name[de]" "[ \"\$(pn LANG=de_CH.UTF-8)\" = Testsitzig ]"
 pruefe "Hülle: Modifikator, Rückfall auf Name[de]" "[ \"\$(pn LANG=de_AT.UTF-8@euro)\" = Testsitzung ]"
@@ -282,6 +285,11 @@ LANG=de_DE.UTF-8 LANGUAGE= LC_ALL= LC_MESSAGES= auswahl
 pruefe "Auswahl de: Sitzungsname Name[de]" "grep -qx 'Name=Ubuntu deutsch' '$W/ubuntu.desktop'"
 LANG=en_US.UTF-8 LANGUAGE= LC_ALL= LC_MESSAGES= auswahl
 pruefe "Auswahl en: Sitzungsname Name" "grep -qx 'Name=Ubuntu' '$W/ubuntu.desktop'"
+sed -i 's/^Name\[de\]=Ubuntu deutsch$/&\nName[it]=Ubuntu italiano\nName[es]=Ubuntu español\nName[fr]=Ubuntu français/' "$Q/usr/ubuntu.desktop"
+for paar in it_IT:'Ubuntu italiano' es_ES:'Ubuntu español' fr_FR:'Ubuntu français'; do
+    LANG=${paar%%:*}.UTF-8 LANGUAGE= LC_ALL= LC_MESSAGES= auswahl
+    pruefe "Auswahl ${paar%%_*}: Sitzungsname Name[${paar%%_*}]" "grep -qx 'Name=${paar#*:}' '$W/ubuntu.desktop'"
+done
 HUELLE_TEST=$TMP/gibt-es-nicht
 auswahl
 pruefe "Auswahl ohne Hülle: keine Sitzung" "[ -z \"\$(ls '$W')\" ] && grep -q 'keine-huelle' '$TMP/lauf/auswahl.txt'"

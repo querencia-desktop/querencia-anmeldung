@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Gleicht die übersetzbaren Texte des gepatchten ReGreet mit dem Katalog ab
 # (läuft auch beim Paketbau, nach dem Patch):
-#   sh tests/uebersetzung-pruefen.sh <regreet-quellbaum> [<po-datei>]
+#   sh tests/uebersetzung-pruefen.sh <regreet-quellbaum> [<po-datei>...]
+# Ohne po-Datei: alle Kataloge in po/ (seit 0.1.5 de, es, fr, it).
 # Jeder Text in tr("...") und in den Variablen, die an tr(...) gehen, muss
-# in der po-Datei stehen und übersetzt sein; msgfmt -c muss sie annehmen.
+# in jeder po-Datei stehen und übersetzt sein; msgfmt -c muss sie annehmen.
 # Dazu: keine sichtbaren Texte ohne tr(...) (keine englischen Reste bei
 # Deutsch), Texte von PAM über tr_pam(...), und die erwarteten Texte aus
 # tests/sprache-texte.txt (eigener Katalog Pflicht, Linux-PAM und GTK nur,
@@ -12,7 +13,8 @@
 # Exit 0 = alles PASS.
 set -u
 Q=${1:?Quellbaum von ReGreet fehlt}
-PO=${2:-$(dirname "$0")/../po/de.po}
+shift
+[ $# -gt 0 ] || set -- "$(dirname "$0")"/../po/*.po
 fehler=0
 ok() { echo "PASS $*"; }
 nein() { echo "FAIL $*"; fehler=1; }
@@ -20,12 +22,14 @@ nein() { echo "FAIL $*"; fehler=1; }
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
-if LC_ALL=C msgfmt -c --statistics -o "$TMP/de.mo" "$PO" 2>"$TMP/stat"; then
-    ok "msgfmt -c $(cat "$TMP/stat")"
-else
-    nein "msgfmt -c: $(cat "$TMP/stat")"
-fi
-grep -q -E 'untranslated|fuzzy' "$TMP/stat" && nein "unübersetzte oder unscharfe Einträge"
+for PO in "$@"; do
+    if LC_ALL=C msgfmt -c --statistics -o "$TMP/probe.mo" "$PO" 2>"$TMP/stat"; then
+        ok "msgfmt -c ${PO##*/}: $(cat "$TMP/stat")"
+    else
+        nein "msgfmt -c ${PO##*/}: $(cat "$TMP/stat")"
+    fi
+    grep -q -E 'untranslated|fuzzy' "$TMP/stat" && nein "${PO##*/}: unübersetzte oder unscharfe Einträge"
+done
 
 # Texte aus dem Quellbaum: tr("...") und error_msg = "..." vor tr(error_msg)
 grep -rhoE '(^|[^A-Za-z0-9_])tr\("[^"]*"\)' "$Q/src" | sed -e 's/^.*tr("//' -e 's/")$//' >"$TMP/texte"
@@ -34,19 +38,22 @@ grep -q 'tr(error_msg)' "$Q/src/gui/model.rs" &&
 sort -u "$TMP/texte" -o "$TMP/texte"
 [ -s "$TMP/texte" ] && ok "$(wc -l <"$TMP/texte") Texte im Quellbaum" || nein "keine tr(...)-Aufrufe in $Q/src (Patch fehlt?)"
 
-python3 -I - "$PO" "$TMP/texte" <<'EOF' || fehler=1
-import re, sys
+for PO in "$@"; do
+    python3 -I - "$PO" "$TMP/texte" <<'EOF' || fehler=1
+import os, re, sys
 po = open(sys.argv[1], encoding="utf-8").read()
+name = os.path.basename(sys.argv[1])
 paare = dict(re.findall(r'^msgid "(.*)"\nmsgstr "(.*)"$', po, re.M))
 for text in open(sys.argv[2], encoding="utf-8").read().splitlines():
     if paare.get(text):
-        print(f"PASS übersetzt: {text} -> {paare[text]}")
+        print(f"PASS übersetzt {name}: {text} -> {paare[text]}")
     else:
-        print(f"FAIL fehlt in der po-Datei: {text}")
+        print(f"FAIL fehlt in {name}: {text}")
         sys.exit(1)
 EOF
+done
 
-# Keine englischen Reste bei Deutsch: sichtbare Texte nur über tr(...),
+# Keine englischen Reste in den Übersetzungen: sichtbare Texte nur über tr(...),
 # Texte von PAM nur über tr_pam(...) (eigener Katalog, dann Linux-PAM).
 T=$Q/src/gui/templates.rs
 M=$Q/src/gui/model.rs
@@ -84,7 +91,7 @@ else
 fi
 
 # Erwartete Texte (tests/sprache-texte.txt)
-python3 -I "$(dirname "$0")/sprache-texte-pruefen.py" "$PO" "$(dirname "$0")/sprache-texte.txt" || fehler=1
+python3 -I "$(dirname "$0")/sprache-texte-pruefen.py" "$(dirname "$0")/sprache-texte.txt" "$@" || fehler=1
 
 [ $fehler = 0 ] && echo "ERGEBNIS: PASS" || echo "ERGEBNIS: FAIL"
 exit $fehler

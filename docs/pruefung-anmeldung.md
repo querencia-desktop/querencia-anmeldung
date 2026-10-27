@@ -63,7 +63,7 @@ ist der Dateiname des Belegs. Passwörter nicht in Belege schreiben.
 | S7 | Neustart | Textanmeldung auf tty1 (kein schwarzer Bildschirm, kein greetd mit `agreety`) |
 | S8 | `sudo apt purge -y querencia-anmeldung` | Ordner wie G20 weg |
 
-## Ü Sprache und Info-Zeile (ab 0.1.2, Ü7–Ü9 ab 0.1.3, Ü8 neu ab 0.1.4, beide Wege)
+## Ü Sprache und Info-Zeile (ab 0.1.2, Ü7–Ü9 ab 0.1.3, Ü8 neu ab 0.1.4, Ü10 ab 0.1.5, beide Wege)
 
 Systemsprache Deutsch: `/etc/default/locale` mit `LANG=de_DE.UTF-8`, die
 Locale erzeugt (`locale -a` zeigt `de_DE.utf8`). Unter Ubuntu 26.04 ist
@@ -81,6 +81,7 @@ Locale erzeugt (`locale -a` zeigt `de_DE.utf8`). Unter Ubuntu 26.04 ist
 | Ü7 | Sitzungsname (ab 0.1.3): `printf '[Desktop Entry]\nName=Test session\nName[de]=Testsitzung\nExec=/bin/false\nType=Application\n' \| sudo tee /usr/local/share/wayland-sessions/probe.desktop`, `freigeben = probe` in `sitzungen.conf`, Anmeldebildschirm neu; danach Datei löschen, Freigabe zurücknehmen | Sitzungsliste „Querencia Desktop“ und „Testsitzung“; `auswahl.txt`: `probe.desktop freigegeben` |
 | Ü8 | Abgelaufenes Passwort (ab 0.1.4): `sudo passwd -e probe`, anmelden mit dem alten Passwort; dann `Strg+Alt+F1`, als `probe` anmelden, altes und zweimal neues Passwort, abmelden, `Strg+Alt+F7`, mit dem neuen Passwort anmelden | „Ihr Passwort ist abgelaufen. Bitte wählen Sie ein neues.“ und „Dazu an der Textkonsole anmelden (Strg+Alt+F1); Strg+Alt+F7 führt hierher zurück.“, nach 10 s noch sichtbar; kein „NEW_AUTHTOK_REQD“; auf tty1 fragt `login` nach dem neuen Passwort; danach Anmeldung am Anmeldebildschirm. Englisch (Ü6): „Your password has expired. Please choose a new one.“ |
 | Ü9 | GTK-Texte: `dpkg -l language-pack-gnome-de-base`; Zeiger auf das Auge im Passwortfeld | mit dem Paket „Text anzeigen“; ohne bleibt es „Show Text“ (Grenze, `docs/uebersetzung.md`) |
+| Ü10 | Italienisch (ab 0.1.5; Spanisch, Französisch entsprechend): `sudo localectl set-locale LANG=it_IT.UTF-8` (Locale erzeugt, `locale -a` zeigt `it_IT.utf8`), Anmeldebildschirm neu; falsches Passwort; Ü8 mit `passwd -e`; danach Sprache zurück | „Utente:“, „Sessione:“, „Accedi“, „Riavvia“, „Spegni“, Tooltip „Inserire il nome utente“; Feld „Password:“, „Annulla“; „Password errata. Riprovare.“; Uhr „27/10/2026 22:30“; abgelaufen: „La password è scaduta. Sceglierne una nuova.“ und „Per farlo, accedere alla console testuale (Ctrl+Alt+F1); Ctrl+Alt+F7 riporta qui.“; nirgends ein englischer Text außer GTK ohne `language-pack-gnome-it-base` (Ü9) |
 
 ## Belege und Rückmeldung
 
